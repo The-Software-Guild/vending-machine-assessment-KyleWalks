@@ -13,76 +13,83 @@ public class DvdLibraryView {
     }
 
     public int printMenuAndGetSelection() {
-        io.print("Main Menu");
-        io.print("1. List Students");
-        io.print("2. Create New Student");
-        io.print("3. View a Student");
-        io.print("4. Remove a Student");
-        io.print("5. Exit");
 
-        return io.readInt("Please select from the above choices.", 1, 5);
+        io.print("Main Menu");
+        io.print("1. List DVDs");
+        io.print("2. View a DVD");
+        io.print("3. Create New DVD");
+        io.print("4. Remove a DVD");
+        io.print("5. Edit a DVD");
+        io.print("6. Exit");
+
+        return io.readInt("Please select from the above choices.", 1, 6);
     }
 
-    public Dvd getNewStudentInfo() {
-        String studentId = io.readString("Please enter Student ID");
-        String firstName = io.readString("Please enter First Name");
-        String lastName = io.readString("Please enter Last Name");
-        String cohort = io.readString("Please enter Cohort");
-        Dvd currentDvd = new Dvd(studentId);
-        currentDvd.setFirstName(firstName);
-        currentDvd.setLastName(lastName);
-        currentDvd.setCohort(cohort);
+    public Dvd getNewDvdInfo() {
+        String dvdTitle = io.readString("Please enter DVD title");
+        String relDate = io.readString("[Optional]Please enter the release date(YYYY)");
+        String director = io.readString("[Optional]Please enter the director's name");
+        String studio = io.readString("[Optional]Please enter the studio");
+        String userEntry = io.readString("[Optional]Please enter your rating/note");
+        Dvd currentDvd = new Dvd(dvdTitle);
+        currentDvd.setRelDate(relDate);
+        currentDvd.setDirector(director);
+        currentDvd.setStudio(studio);
+        currentDvd.setUserNote(userEntry);
         return currentDvd;
     }
 
-    public void displayCreateStudentBanner() {
-        io.print("=== Create Student ===");
+    public void displayCreateDvdBanner() {
+        io.print("=== Create DVD ===");
     }
 
     public void displayCreateSuccessBanner() {
-        io.readString("Student successfully created.  Please hit enter to continue");
+        io.readString("DVD successfully created.  Please hit enter to continue");
     }
 
-    public void displayStudentList(List<Dvd> dvdList) {
+    public void displayDvdList(List<Dvd> dvdList) {
         for (Dvd currentDvd : dvdList) {
-            String studentInfo = String.format("#%s : %s %s",
-                    currentDvd.getStudentId(),
-                    currentDvd.getFirstName(),
-                    currentDvd.getLastName());
-            io.print(studentInfo);
+            String dvdInfo = String.format("%s : %s %s",
+                    currentDvd.getTitle(),
+                    currentDvd.getRelDate(),
+                    currentDvd.getDirector());
+            io.print(dvdInfo);
         }
         io.readString("Please hit enter to continue.");
     }
 
-    public void displayRemoveStudentBanner () {
-        io.print("=== Remove Student ===");
+    public void displayRemoveDvdBanner() {
+        io.print("=== Remove DVD ===");
     }
 
     public void displayRemoveResult(Dvd dvdRecord) {
         if(dvdRecord != null){
-            io.print("Student successfully removed.");
+            io.print("DVD successfully removed.");
         }else{
-            io.print("No such student.");
+            io.print("No such DVD.");
         }
         io.readString("Please hit enter to continue.");
     }
 
-    public void displayDisplayStudentBanner () {
-        io.print("=== Display Student ===");
+    public void displayDisplayDvdBanner() {
+        io.print("=== Display DVD ===");
     }
 
-    public String getStudentIdChoice() {
-        return io.readString("Please enter the Student ID.");
+    public String getDvdTitleChoice() {
+        return io.readString("Please enter the DVD title.");
     }
 
-    public void displayStudent(Dvd dvd) {
+    public void displayDvd(Dvd dvd) {
         if (dvd != null) {
-            io.print(dvd.getStudentId());
-            io.print(dvd.getFirstName() + " " + dvd.getLastName());
-            io.print(dvd.getCohort());
+            io.print(dvd.getTitle());
+            io.print(dvd.getRelDate());
+            io.print(dvd.getDirector());
+            io.print(dvd.getStudio());
+            io.print(dvd.getUserNote());
+            io.print(dvd.getMpaaRating());
             io.print("");
         } else {
-            io.print("No such student.");
+            io.print("No such DVD.");
         }
         io.readString("Please hit enter to continue.");
     }
@@ -101,6 +108,6 @@ public class DvdLibraryView {
     }
 
     public void displayDisplayAllBanner() {
-        io.print("=== Display All Students ===");
+        io.print("=== Display All DVDs ===");
     }
 }

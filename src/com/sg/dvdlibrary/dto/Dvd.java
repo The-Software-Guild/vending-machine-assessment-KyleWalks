@@ -6,24 +6,24 @@ public class Dvd {
     private String mpaaRating;
     private String director;
     private String studio;
-    private String userEntry;
+    private String userNote;
 
     public Dvd(String title) {
         this.title = title;
-        this.relDate = "";
-        this.mpaaRating = "";
-        this.director = "";
-        this.studio = "";
-        this.userEntry = "";
+        this.relDate = " ";
+        this.mpaaRating = " ";
+        this.director = " ";
+        this.studio = " ";
+        this.userNote = " ";
     }
 
-    public Dvd(String title, String relDate, String mpaaRating, String director, String studio, String userEntry) {
+    public Dvd(String title, String relDate, String mpaaRating, String director, String studio, String userNote) {
         this.title = title;
         this.relDate = relDate;
         this.mpaaRating = mpaaRating;
         this.director = director;
         this.studio = studio;
-        this.userEntry = userEntry;
+        this.userNote = userNote;
     }
 
     public String getTitle() {
@@ -66,11 +66,11 @@ public class Dvd {
         this.studio = studio;
     }
 
-    public String getUserEntry() {
-        return userEntry;
+    public String getUserNote() {
+        return userNote;
     }
 
-    public void setUserEntry(String userEntry) {
-        this.userEntry = userEntry;
+    public void setUserNote(String userNote) {
+        this.userNote = userNote;
     }
 }

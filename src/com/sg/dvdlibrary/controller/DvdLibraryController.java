@@ -19,7 +19,7 @@ public class DvdLibraryController {
 
     public void run() {
         boolean keepGoing = true;
-        int menuSelection = 0;
+        int menuSelection;
         try {
             while (keepGoing) {
 
@@ -27,16 +27,16 @@ public class DvdLibraryController {
 
                 switch (menuSelection) {
                     case 1:
-                        listStudents();
+                        listDvds();
                         break;
                     case 2:
-                        createStudent();
+                        createDvd();
                         break;
                     case 3:
-                        viewStudent();
+                        viewDvd();
                         break;
                     case 4:
-                        removeStudent();
+                        removeDvd();
                         break;
                     case 5:
                         keepGoing = false;
@@ -52,31 +52,31 @@ public class DvdLibraryController {
         }
     }
 
-    private void createStudent() throws DvdLibraryDaoException {
-        view.displayCreateStudentBanner();
-        Dvd newDvd = view.getNewStudentInfo();
-        dao.addStudent(newDvd.getStudentId(), newDvd);
+    private void createDvd() throws DvdLibraryDaoException {
+        view.displayCreateDvdBanner();
+        Dvd newDvd = view.getNewDvdInfo();
+        dao.addDvd(newDvd.getTitle(), newDvd);
         view.displayCreateSuccessBanner();
     }
 
-    private void removeStudent() throws DvdLibraryDaoException {
-        view.displayRemoveStudentBanner();
-        String studentId = view.getStudentIdChoice();
-        Dvd removedDvd = dao.removeStudent(studentId);
+    private void removeDvd() throws DvdLibraryDaoException {
+        view.displayRemoveDvdBanner();
+        String dvdTitle = view.getDvdTitleChoice();
+        Dvd removedDvd = dao.removeDvd(dvdTitle);
         view.displayRemoveResult(removedDvd);
     }
 
-    private void listStudents() throws DvdLibraryDaoException {
+    private void listDvds() throws DvdLibraryDaoException {
         view.displayDisplayAllBanner();
-        List<Dvd> dvdList = dao.getAllStudents();
-        view.displayStudentList(dvdList);
+        List<Dvd> dvdList = dao.getAllDvds();
+        view.displayDvdList(dvdList);
     }
 
-    private void viewStudent() throws DvdLibraryDaoException {
-        view.displayDisplayStudentBanner();
-        String studentId = view.getStudentIdChoice();
-        Dvd dvd = dao.getStudent(studentId);
-        view.displayStudent(dvd);
+    private void viewDvd() throws DvdLibraryDaoException {
+        view.displayDisplayDvdBanner();
+        String dvdTitle = view.getDvdTitleChoice();
+        Dvd dvd = dao.getDvd(dvdTitle);
+        view.displayDvd(dvd);
     }
 
     private void unknownCommand() {
