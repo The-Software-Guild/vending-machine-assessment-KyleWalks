@@ -19,98 +19,84 @@ public class DvdLibraryDaoFileImpl implements UserIO, DvdLibraryDao {
 
     final private Scanner console = new Scanner(System.in);
 
-    private Map<String, Dvd> dvds = new HashMap<>();
+    private final Map<String, Dvd> dvds = new HashMap<>();
 
     public static final String LIBRARY_FILE = "library.txt";
     public static final String DELIMITER = "::";
 
+    /**
+     * Takes a string representing a DVD object and splits it on the DELIMITER
+     * to obtain each property of the DVD.
+     *
+     * 1234::Ada::Lovelace::Java-September1842
+     * __________________________________________________________________________
+     * |              |    |              |                        |          | |
+     * |The Green Mile|1999|Frank Darabont|Warner Hollywood Studios|10/10 Good|R|
+     * |              |    |              |                        |          | |
+     * --------------------------------------------------------------------------
+     *
+     * @param dvdAsText String representing a DVD object as text.
+     * @return DVD loaded from database.
+     */
     private Dvd unmarshallDvd(String dvdAsText){
-        // dvdAsText is expecting a line read in from our file.
-        // For example, it might look like this:
-        // 1234::Ada::Lovelace::Java-September1842
-        //
-        // We then split that line on our DELIMITER - which we are using as ::
-        // Leaving us with an array of Strings, stored in dvdTokens.
-        // Which should look like this:
-        // __________________________________________________________________________
-        // |              |    |              |                        |          | |
-        // |The Green Mile|1999|Frank Darabont|Warner Hollywood Studios|10/10 Good|R|
-        // |              |    |              |                        |          | |
-        // --------------------------------------------------------------------------
-        //        [0]       [1]       [2]                 [3]
         String[] dvdTokens = dvdAsText.split(DELIMITER);
 
-        // Given the pattern above, the dvd title is in index 0 of the array.
         String dvdTitle = dvdTokens[0];
 
-        // Which we can then use to create a new Student object to satisfy
-        // the requirements of the Student constructor.
         Dvd dvdFromFile = new Dvd(dvdTitle);
 
-        // However, there are 3 remaining tokens that need to be set into the
-        // new student object. Do this manually by using the appropriate setters.
+        // Check if optional input was entered.
+        if (!dvdTokens[1].equals(" "))
+            dvdFromFile.setRelDate(dvdTokens[1]);
 
-        // Index 1 - ReleaseDate
-        dvdFromFile.setRelDate(dvdTokens[1]);
+        if (!dvdTokens[2].equals(" "))
+            dvdFromFile.setDirector(dvdTokens[2]);
 
-        // Index 2 - Director
-        dvdFromFile.setDirector(dvdTokens[2]);
+        if (!dvdTokens[3].equals(" "))
+            dvdFromFile.setStudio(dvdTokens[3]);
 
-        // Index 3 - Studio
-        dvdFromFile.setStudio(dvdTokens[3]);
+        if (!dvdTokens[4].equals(" "))
+            dvdFromFile.setUserNote(dvdTokens[4]);
 
-        // Index 4 - User Note
-        dvdFromFile.setRelDate(dvdTokens[4]);
+        if (!dvdTokens[5].equals(" "))
+            dvdFromFile.setMpaaRating(dvdTokens[5]);
 
-        // Index 5 - MPAA Rating
-        dvdFromFile.setDirector(dvdTokens[5]);
-
-        // We have now created a student! Return it!
         return dvdFromFile;
     }
 
+    /**
+     * Converts a DVD object into a string where each property
+     * is split by the DELIMITER.
+     *
+     * The Green Mile::1999::Frank Darabont::Warner Hollywood Studios::10/10 Good::R
+     *
+     * @param aDvd DVD object to be converted.
+     * @return the string representing the DVD object.
+     */
     private String marshallDvd(Dvd aDvd){
-        // We need to turn a Dvd object into a line of text for our file.
-        // For example, we need an in memory object to end up like this:
-        // The Green Mile::1999::Frank Darabont::Warner Hollywood Studios::10/10 Good::R
 
-        // It's not a complicated process. Just get out each property,
-        // and concatenate with our DELIMITER as a kind of spacer.
-
-        // Start with the student id, since that's supposed to be first.
         String dvdAsText = aDvd.getTitle() + DELIMITER;
 
-        // add the rest of the properties in the correct order:
-
-        // FirstName
         dvdAsText += aDvd.getRelDate() + DELIMITER;
 
-        // LastName
         dvdAsText += aDvd.getDirector() + DELIMITER;
 
-        // Cohort - don't forget to skip the DELIMITER here.
         dvdAsText += aDvd.getStudio() + DELIMITER;
 
         dvdAsText += aDvd.getUserNote() + DELIMITER;
 
         dvdAsText += aDvd.getMpaaRating();
 
-        // We have now turned a student to text! Return it!
         return dvdAsText;
     }
 
     /**
-     * Writes all students in the roster out to a LIBRARY_FILE.  See loadLibrary
+     * Writes all DVDs in the library out to LIBRARY_FILE. See loadLibrary
      * for file format.
      *
      * @throws DvdLibraryDaoException if an error occurs writing to the file
      */
-    private void writeRoster() throws DvdLibraryDaoException {
-        // NOTE FOR APPRENTICES: We are not handling the IOException - but
-        // we are translating it to an application specific exception and
-        // then simple throwing it (i.e. 'reporting' it) to the code that
-        // called us.  It is the responsibility of the calling code to
-        // handle any errors that occur.
+    private void writeLibrary() throws DvdLibraryDaoException {
         PrintWriter out;
 
         try {
@@ -120,30 +106,30 @@ public class DvdLibraryDaoFileImpl implements UserIO, DvdLibraryDao {
                     "Could not save dvd data.", e);
         }
 
-        // Write out the Student objects to the roster file.
-        // NOTE TO THE APPRENTICES: We could just grab the student map,
-        // get the Collection of Students and iterate over them but we've
-        // already created a method that gets a List of Students so
-        // we'll reuse it.
         String dvdAsText;
         List<Dvd> dvdList = this.getAllDvds();
+
         for (Dvd currentDvd : dvdList) {
-            // turn a Student into a String
             dvdAsText = marshallDvd(currentDvd);
-            // write the Student object to the file
+
             out.println(dvdAsText);
-            // force PrintWriter to write line to the file
+
             out.flush();
         }
-        // Clean up
+
         out.close();
     }
 
+    /**
+     * Converts all the strings representing DVDs in the
+     * library file into DVD objects.
+     *
+     * @throws DvdLibraryDaoException if loading the library file fails.
+     */
     private void loadLibrary() throws DvdLibraryDaoException {
         Scanner scanner;
 
         try {
-            // Create Scanner for reading the file
             scanner = new Scanner(
                     new BufferedReader(
                             new FileReader(LIBRARY_FILE)));
@@ -151,52 +137,81 @@ public class DvdLibraryDaoFileImpl implements UserIO, DvdLibraryDao {
             throw new DvdLibraryDaoException(
                     "-_- Could not load roster data into memory.", e);
         }
-        // currentLine holds the most recent line read from the file
+
         String currentLine;
-        // currentStudent holds the most recent student unmarshalled
+
         Dvd currentDvd;
-        // Go through LIBRARY_FILE line by line, decoding each line into a
-        // Student object by calling the unmarshallStudent method.
-        // Process while we have more lines in the file
+
         while (scanner.hasNextLine()) {
-            // get the next line in the file
             currentLine = scanner.nextLine();
-            // unmarshall the line into a Student
+
             currentDvd = unmarshallDvd(currentLine);
 
-            // We are going to use the student id as the map key for our student object.
-            // Put currentStudent into the map using student id as the key
             dvds.put(currentDvd.getTitle(), currentDvd);
         }
-        // close scanner
+
         scanner.close();
     }
 
+    /**
+     * Adds a DVD to the library file.
+     *
+     * @param dvdTitle title with which DVD is to be associated
+     * @param dvd DVD to be added to the library
+     * @return the DVD added to the library.
+     * @throws DvdLibraryDaoException if loading/saving the library fails.
+     */
     @Override
     public Dvd addDvd(String dvdTitle, Dvd dvd) throws DvdLibraryDaoException {
         loadLibrary();
+
         Dvd newDvd = dvds.put(dvdTitle, dvd);
-        writeRoster();
+
+        writeLibrary();
+
         return newDvd;
     }
 
+    /**
+     * Loads all the DVDs from the library.
+     *
+     * @return the list of DVDs
+     * @throws DvdLibraryDaoException if loading the library fails.
+     */
     @Override
     public List<Dvd> getAllDvds() throws DvdLibraryDaoException {
         loadLibrary();
         return new ArrayList(dvds.values());
     }
 
+    /**
+     * Retrieves a DVD from the database.
+     *
+     * @param dvdTitle Title of the DVD to retrieve
+     * @return the DVD retrieved
+     * @throws DvdLibraryDaoException if loading the library fails.
+     */
     @Override
     public Dvd getDvd(String dvdTitle) throws DvdLibraryDaoException {
         loadLibrary();
         return dvds.get(dvdTitle);
     }
 
+    /**
+     * Removes a DVD from the library.
+     *
+     * @param dvdTitle title of DVD to be removed
+     * @return the removed DVD
+     * @throws DvdLibraryDaoException if loading/saving the library fails.
+     */
     @Override
     public Dvd removeDvd(String dvdTitle) throws DvdLibraryDaoException {
         loadLibrary();
+
         Dvd removedDvd = dvds.remove(dvdTitle);
-        writeRoster();
+
+        writeLibrary();
+
         return removedDvd;
     }
 

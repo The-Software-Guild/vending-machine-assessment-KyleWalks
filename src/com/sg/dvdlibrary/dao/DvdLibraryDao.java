@@ -6,49 +6,49 @@ import java.util.List;
 
 public interface DvdLibraryDao {
     /**
-     * Adds the given Student to the roster and associates it with the given
-     * student id. If there is already a student associated with the given
-     * student id it will return that student object, otherwise it will
+     * Adds the given DVD to the library and associates it with the given
+     * DVD title. If there is already a DVD associated with the given
+     * DVD title it will return that DVD object, otherwise it will
      * return null.
      *
-     * @param dvdTitle id with which student is to be associated
-     * @param dvd student to be added to the roster
-     * @return the Student object previously associated with the given
-     * student id if it exists, null otherwise
+     * @param dvdTitle title with which DVD is to be associated
+     * @param dvd DVD to be added to the library
+     * @return the DVD object previously associated with the given
+     * DVD title if it exists, null otherwise
      * @throws DvdLibraryDaoException
      */
     Dvd addDvd(String dvdTitle, Dvd dvd)
             throws DvdLibraryDaoException;
 
     /**
-     * Returns a List of all Students on the roster.
+     * Returns a List of all DVDs on the library.
      *
-     * @return Student List containing all students on the roster.
+     * @return DVD List containing all DVDs on the library.
      * @throws DvdLibraryDaoException
      */
     List<Dvd> getAllDvds()
             throws DvdLibraryDaoException;
 
     /**
-     * Returns the student object associated with the given student id.
-     * Returns null if no such student exists
+     * Returns the DVD object associated with the given DVD title.
+     * Returns null if no such DVD exists
      *
-     * @param dvdTitle ID of the student to retrieve
-     * @return the Student object associated with the given student id,
-     * null if no such student exists
+     * @param dvdTitle Title of the DVD to retrieve
+     * @return the DVD object associated with the given DVD title,
+     * null if no such DVD exists
      * @throws DvdLibraryDaoException
      */
     Dvd getDvd(String dvdTitle)
             throws DvdLibraryDaoException;
 
     /**
-     * Removes from the roster the student associated with the given id.
-     * Returns the student object that is being removed or null if
-     * there is no student associated with the given id
+     * Removes from the library the DVD associated with the given title.
+     * Returns the DVD object that is being removed or null if
+     * there is no DVD associated with the given title
      *
-     * @param dvdTitle id of student to be removed
-     * @return Student object that was removed or null if no student
-     * was associated with the given student id
+     * @param dvdTitle title of DVD to be removed
+     * @return DVD object that was removed or null if no DVD
+     * was associated with the given DVD title
      * @throws DvdLibraryDaoException
      */
     Dvd removeDvd(String dvdTitle)
