@@ -1,14 +1,14 @@
-package com.sg.dvdlibrary.ui;
+package com.sg.vendingmachine.ui;
 
-import com.sg.dvdlibrary.dto.Dvd;
+import com.sg.vendingmachine.dto.VendingItem;
 
 import java.util.List;
 
-public class DvdLibraryView {
+public class VendingMachineView {
 
     private final UserIO io;
 
-    public DvdLibraryView(UserIO io) {
+    public VendingMachineView(UserIO io) {
         this.io = io;
     }
 
@@ -56,11 +56,11 @@ public class DvdLibraryView {
      *
      * @return the DVD that was created.
      */
-    public Dvd getNewDvdInfo() {
+    public VendingItem getNewItemInfo() {
         // Required
-        String dvdTitle = io.readString("Please enter DVD title");
-        while (!checkString(dvdTitle))
-            dvdTitle = io.readString("Please enter DVD title");
+        String itemName = io.readString("Please enter DVD title");
+        while (!checkString(itemName))
+            itemName = io.readString("Please enter DVD title");
 
         // Optional
         String relDate = io.readString("[Optional]Please enter the release date(YYYY)");
@@ -76,26 +76,26 @@ public class DvdLibraryView {
         userEntry = !userEntry.isEmpty() ? relDate : " ";
         mpaaRating = !mpaaRating.isEmpty() ? relDate : " ";
 
-        Dvd currentDvd = new Dvd(dvdTitle);
+        VendingItem currentVendingItem = new VendingItem(itemName);
 
-        currentDvd.setRelDate(relDate);
-        currentDvd.setDirector(director);
-        currentDvd.setStudio(studio);
-        currentDvd.setUserNote(userEntry);
-        currentDvd.setMpaaRating(mpaaRating);
+        currentVendingItem.setRelDate(relDate);
+        currentVendingItem.setDirector(director);
+        currentVendingItem.setStudio(studio);
+        currentVendingItem.setUserNote(userEntry);
+        currentVendingItem.setMpaaRating(mpaaRating);
 
-        return currentDvd;
+        return currentVendingItem;
     }
 
     /**
      * Retrieves the property value being changed by
      * the user.
      *
-     * @param currDvd The DVD that is being edited.
+     * @param currVendingItem The DVD that is being edited.
      * @param propChoice Integer representing the property to be changed.
      * @return the altered DVD.
      */
-    public Dvd getNewDvdInfo(Dvd currDvd, int propChoice) {
+    public VendingItem getNewItemInfo(VendingItem currVendingItem, int propChoice) {
         String propChange = "";
 
         while (!checkString(propChange)) {
@@ -116,34 +116,34 @@ public class DvdLibraryView {
                     propChange = io.readString("Please enter your rating/note");
                     break;
                 default:
-                    return currDvd;
+                    return currVendingItem;
             }
         }
 
         switch (propChoice) {
             case 1:
-                currDvd.setTitle(propChange);
+                currVendingItem.setTitle(propChange);
                 break;
             case 2:
-                currDvd.setRelDate(propChange);
+                currVendingItem.setRelDate(propChange);
                 break;
             case 3:
-                currDvd.setDirector(propChange);
+                currVendingItem.setDirector(propChange);
                 break;
             case 4:
-                currDvd.setStudio(propChange);
+                currVendingItem.setStudio(propChange);
                 break;
             case 5:
-                currDvd.setUserNote(propChange);
+                currVendingItem.setUserNote(propChange);
                 break;
             default:
                 break;
         }
 
-        return currDvd;
+        return currVendingItem;
     }
 
-    public void displayCreateDvdBanner() {
+    public void displayCreateItemBanner() {
         io.print("=== Create DVD ===");
     }
 
@@ -155,26 +155,26 @@ public class DvdLibraryView {
      * Displays a compact summary of the DVDs
      * in the library.
      *
-     * @param dvdList List of DVDs in the library.
+     * @param vendingItemList List of DVDs in the library.
      */
-    public void displayDvdList(List<Dvd> dvdList) {
-        for (Dvd currentDvd : dvdList) {
+    public void displayItemList(List<VendingItem> vendingItemList) {
+        for (VendingItem currentVendingItem : vendingItemList) {
             String dvdInfo = String.format("%s : %s %s",
-                    currentDvd.getTitle(),
-                    currentDvd.getRelDate(),
-                    currentDvd.getDirector());
+                    currentVendingItem.getTitle(),
+                    currentVendingItem.getRelDate(),
+                    currentVendingItem.getDirector());
 
             io.print(dvdInfo);
         }
         io.readString("Please hit enter to continue.");
     }
 
-    public void displayRemoveDvdBanner() {
+    public void displayRemoveItemBanner() {
         io.print("=== Remove DVD ===");
     }
 
-    public void displayRemoveResult(Dvd dvdRecord) {
-        if(dvdRecord != null){
+    public void displayRemoveResult(VendingItem vendingItemRecord) {
+        if(vendingItemRecord != null){
             io.print("DVD successfully removed.");
         }else{
             io.print("No such DVD.");
@@ -182,15 +182,15 @@ public class DvdLibraryView {
         io.readString("Please hit enter to continue.");
     }
 
-    public void displayDisplayDvdBanner() {
+    public void displayDisplayItemBanner() {
         io.print("=== Display DVD ===");
     }
 
-    public String getDvdTitleChoice() {
+    public String getItemNameChoice() {
         return io.readString("Please enter the DVD title.");
     }
 
-    public String getDvdEditChoice() {
+    public String getItemEditChoice() {
         io.print("");
         return io.readString("Please enter the DVD property you would like to edit.");
     }
@@ -198,18 +198,18 @@ public class DvdLibraryView {
     /**
      * Formatted output of the properties of a DVD.
      *
-     * @param dvd the DVD to be displayed.
+     * @param vendingItem the DVD to be displayed.
      */
-    public void displayDvd(Dvd dvd) {
+    public void displayItem(VendingItem vendingItem) {
         io.print("");
 
-        if (dvd != null) {
-            System.out.printf("%20s: %-15s\n", "Title", dvd.getTitle());
-            System.out.printf("%20s: %-15s\n", "Release Date", dvd.getRelDate());
-            System.out.printf("%20s: %-15s\n", "Director", dvd.getDirector());
-            System.out.printf("%20s: %-15s\n", "Studio", dvd.getStudio());
-            System.out.printf("%20s: %-15s\n", "User Note", dvd.getUserNote());
-            System.out.printf("%20s: %-15s\n", "MPAA Rating", dvd.getMpaaRating());
+        if (vendingItem != null) {
+            System.out.printf("%20s: %-15s\n", "Title", vendingItem.getTitle());
+            System.out.printf("%20s: %-15s\n", "Release Date", vendingItem.getRelDate());
+            System.out.printf("%20s: %-15s\n", "Director", vendingItem.getDirector());
+            System.out.printf("%20s: %-15s\n", "Studio", vendingItem.getStudio());
+            System.out.printf("%20s: %-15s\n", "User Note", vendingItem.getUserNote());
+            System.out.printf("%20s: %-15s\n", "MPAA Rating", vendingItem.getMpaaRating());
 
             io.print("");
         } else {

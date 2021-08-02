@@ -2,26 +2,26 @@
 * The Software Guild
 * Copyright (C) 2020 Wiley edu LLC - All Rights Reserved
 *********************************/
-package com.sg.dvdlibrary.dao;
+package com.sg.vendingmachine.dao;
 
 /**
  * TSG Official Implementation of the UserIO interface
  * May your view be ever in your favor!
  * @author ahill
  */
-import com.sg.dvdlibrary.dto.Dvd;
-import com.sg.dvdlibrary.ui.UserIO;
+import com.sg.vendingmachine.dto.VendingItem;
+import com.sg.vendingmachine.ui.UserIO;
 
 import java.io.*;
 import java.util.*;
 
-public class DvdLibraryDaoFileImpl implements UserIO, DvdLibraryDao {
+public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
 
     final private Scanner console = new Scanner(System.in);
 
-    private final Map<String, Dvd> dvds = new HashMap<>();
+    private final Map<String, VendingItem> vendingItems = new HashMap<>();
 
-    public static final String LIBRARY_FILE = "library.txt";
+    public static final String VENDING_MACHINE_TXT = "vendingMachine.txt";
     public static final String DELIMITER = "::";
 
     /**
@@ -35,33 +35,33 @@ public class DvdLibraryDaoFileImpl implements UserIO, DvdLibraryDao {
      * |              |    |              |                        |          | |
      * --------------------------------------------------------------------------
      *
-     * @param dvdAsText String representing a DVD object as text.
+     * @param itemAsText String representing a DVD object as text.
      * @return DVD loaded from database.
      */
-    private Dvd unmarshallDvd(String dvdAsText){
-        String[] dvdTokens = dvdAsText.split(DELIMITER);
+    private VendingItem unmarshallItem(String itemAsText){
+        String[] itemTokens = itemAsText.split(DELIMITER);
 
-        String dvdTitle = dvdTokens[0];
+        String itemName = itemTokens[0];
 
-        Dvd dvdFromFile = new Dvd(dvdTitle);
+        VendingItem vendingItemFromFile = new VendingItem(itemName);
 
         // Check if optional input was entered.
-        if (!dvdTokens[1].equals(" "))
-            dvdFromFile.setRelDate(dvdTokens[1]);
+        if (!itemTokens[1].equals(" "))
+            vendingItemFromFile.setRelDate(itemTokens[1]);
 
-        if (!dvdTokens[2].equals(" "))
-            dvdFromFile.setDirector(dvdTokens[2]);
+        if (!itemTokens[2].equals(" "))
+            vendingItemFromFile.setDirector(itemTokens[2]);
 
-        if (!dvdTokens[3].equals(" "))
-            dvdFromFile.setStudio(dvdTokens[3]);
+        if (!itemTokens[3].equals(" "))
+            vendingItemFromFile.setStudio(itemTokens[3]);
 
-        if (!dvdTokens[4].equals(" "))
-            dvdFromFile.setUserNote(dvdTokens[4]);
+        if (!itemTokens[4].equals(" "))
+            vendingItemFromFile.setUserNote(itemTokens[4]);
 
-        if (!dvdTokens[5].equals(" "))
-            dvdFromFile.setMpaaRating(dvdTokens[5]);
+        if (!itemTokens[5].equals(" "))
+            vendingItemFromFile.setMpaaRating(itemTokens[5]);
 
-        return dvdFromFile;
+        return vendingItemFromFile;
     }
 
     /**
@@ -70,49 +70,49 @@ public class DvdLibraryDaoFileImpl implements UserIO, DvdLibraryDao {
      *
      * The Green Mile::1999::Frank Darabont::Warner Hollywood Studios::10/10 Good::R
      *
-     * @param aDvd DVD object to be converted.
+     * @param aVendingItem DVD object to be converted.
      * @return the string representing the DVD object.
      */
-    private String marshallDvd(Dvd aDvd){
+    private String marshallItem(VendingItem aVendingItem){
 
-        String dvdAsText = aDvd.getTitle() + DELIMITER;
+        String itemAsText = aVendingItem.getTitle() + DELIMITER;
 
-        dvdAsText += aDvd.getRelDate() + DELIMITER;
+        itemAsText += aVendingItem.getRelDate() + DELIMITER;
 
-        dvdAsText += aDvd.getDirector() + DELIMITER;
+        itemAsText += aVendingItem.getDirector() + DELIMITER;
 
-        dvdAsText += aDvd.getStudio() + DELIMITER;
+        itemAsText += aVendingItem.getStudio() + DELIMITER;
 
-        dvdAsText += aDvd.getUserNote() + DELIMITER;
+        itemAsText += aVendingItem.getUserNote() + DELIMITER;
 
-        dvdAsText += aDvd.getMpaaRating();
+        itemAsText += aVendingItem.getMpaaRating();
 
-        return dvdAsText;
+        return itemAsText;
     }
 
     /**
      * Writes all DVDs in the library out to LIBRARY_FILE. See loadLibrary
      * for file format.
      *
-     * @throws DvdLibraryDaoException if an error occurs writing to the file
+     * @throws VendingMachineDaoException if an error occurs writing to the file
      */
-    private void writeLibrary() throws DvdLibraryDaoException {
+    private void writeVendingMachine() throws VendingMachineDaoException {
         PrintWriter out;
 
         try {
-            out = new PrintWriter(new FileWriter(LIBRARY_FILE));
+            out = new PrintWriter(new FileWriter(VENDING_MACHINE_TXT));
         } catch (IOException e) {
-            throw new DvdLibraryDaoException(
+            throw new VendingMachineDaoException(
                     "Could not save dvd data.", e);
         }
 
-        String dvdAsText;
-        List<Dvd> dvdList = this.getAllDvds();
+        String itemAsText;
+        List<VendingItem> vendingItemList = this.getAllItems();
 
-        for (Dvd currentDvd : dvdList) {
-            dvdAsText = marshallDvd(currentDvd);
+        for (VendingItem currentVendingItem : vendingItemList) {
+            itemAsText = marshallItem(currentVendingItem);
 
-            out.println(dvdAsText);
+            out.println(itemAsText);
 
             out.flush();
         }
@@ -124,30 +124,30 @@ public class DvdLibraryDaoFileImpl implements UserIO, DvdLibraryDao {
      * Converts all the strings representing DVDs in the
      * library file into DVD objects.
      *
-     * @throws DvdLibraryDaoException if loading the library file fails.
+     * @throws VendingMachineDaoException if loading the library file fails.
      */
-    private void loadLibrary() throws DvdLibraryDaoException {
+    private void loadVendingMachine() throws VendingMachineDaoException {
         Scanner scanner;
 
         try {
             scanner = new Scanner(
                     new BufferedReader(
-                            new FileReader(LIBRARY_FILE)));
+                            new FileReader(VENDING_MACHINE_TXT)));
         } catch (FileNotFoundException e) {
-            throw new DvdLibraryDaoException(
-                    "-_- Could not load roster data into memory.", e);
+            throw new VendingMachineDaoException(
+                    "-_- Could not load vending machine data into memory.", e);
         }
 
         String currentLine;
 
-        Dvd currentDvd;
+        VendingItem currentVendingItem;
 
         while (scanner.hasNextLine()) {
             currentLine = scanner.nextLine();
 
-            currentDvd = unmarshallDvd(currentLine);
+            currentVendingItem = unmarshallItem(currentLine);
 
-            dvds.put(currentDvd.getTitle(), currentDvd);
+            vendingItems.put(currentVendingItem.getItemName(), currentVendingItem);
         }
 
         scanner.close();
@@ -156,63 +156,63 @@ public class DvdLibraryDaoFileImpl implements UserIO, DvdLibraryDao {
     /**
      * Adds a DVD to the library file.
      *
-     * @param dvdTitle title with which DVD is to be associated
-     * @param dvd DVD to be added to the library
+     * @param itemName title with which DVD is to be associated
+     * @param vendingItem DVD to be added to the library
      * @return the DVD added to the library.
-     * @throws DvdLibraryDaoException if loading/saving the library fails.
+     * @throws VendingMachineDaoException if loading/saving the library fails.
      */
     @Override
-    public Dvd addDvd(String dvdTitle, Dvd dvd) throws DvdLibraryDaoException {
-        loadLibrary();
+    public VendingItem addItem(String itemName, VendingItem vendingItem) throws VendingMachineDaoException {
+        loadVendingMachine();
 
-        Dvd newDvd = dvds.put(dvdTitle, dvd);
+        VendingItem newVendingItem = vendingItems.put(itemName, vendingItem);
 
-        writeLibrary();
+        writeVendingMachine();
 
-        return newDvd;
+        return newVendingItem;
     }
 
     /**
      * Loads all the DVDs from the library.
      *
      * @return the list of DVDs
-     * @throws DvdLibraryDaoException if loading the library fails.
+     * @throws VendingMachineDaoException if loading the library fails.
      */
     @Override
-    public List<Dvd> getAllDvds() throws DvdLibraryDaoException {
-        loadLibrary();
-        return new ArrayList(dvds.values());
+    public List<VendingItem> getAllItems() throws VendingMachineDaoException {
+        loadVendingMachine();
+        return new ArrayList(vendingItems.values());
     }
 
     /**
      * Retrieves a DVD from the database.
      *
-     * @param dvdTitle Title of the DVD to retrieve
+     * @param itemName Title of the DVD to retrieve
      * @return the DVD retrieved
-     * @throws DvdLibraryDaoException if loading the library fails.
+     * @throws VendingMachineDaoException if loading the library fails.
      */
     @Override
-    public Dvd getDvd(String dvdTitle) throws DvdLibraryDaoException {
-        loadLibrary();
-        return dvds.get(dvdTitle);
+    public VendingItem getItem(String itemName) throws VendingMachineDaoException {
+        loadVendingMachine();
+        return vendingItems.get(itemName);
     }
 
     /**
      * Removes a DVD from the library.
      *
-     * @param dvdTitle title of DVD to be removed
+     * @param itemName title of DVD to be removed
      * @return the removed DVD
-     * @throws DvdLibraryDaoException if loading/saving the library fails.
+     * @throws VendingMachineDaoException if loading/saving the library fails.
      */
     @Override
-    public Dvd removeDvd(String dvdTitle) throws DvdLibraryDaoException {
-        loadLibrary();
+    public VendingItem removeItem(String itemName) throws VendingMachineDaoException {
+        loadVendingMachine();
 
-        Dvd removedDvd = dvds.remove(dvdTitle);
+        VendingItem removedVendingItem = vendingItems.remove(itemName);
 
-        writeLibrary();
+        writeVendingMachine();
 
-        return removedDvd;
+        return removedVendingItem;
     }
 
     /**

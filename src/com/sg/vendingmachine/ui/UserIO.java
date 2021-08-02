@@ -1,4 +1,4 @@
-package com.sg.dvdlibrary.ui;
+package com.sg.vendingmachine.ui;
 
 public interface UserIO {
     void print(String msg);
