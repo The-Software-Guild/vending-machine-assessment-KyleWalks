@@ -1,67 +1,78 @@
 package com.sg.vendingmachine.service;
 
+import com.sg.vendingmachine.dao.VendingMachineAuditDao;
 import com.sg.vendingmachine.dao.VendingMachineDao;
+import com.sg.vendingmachine.dao.VendingMachineDaoException;
 import com.sg.vendingmachine.dto.VendingItem;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class VendingMachineServiceLayerImpl implements VendingMachineServiceLayer {
 
     private VendingMachineDao dao;
+    private VendingMachineAuditDao auditDao;
 
-    public VendingMachineServiceLayerImpl(VendingMachineDao dao) {
+    public VendingMachineServiceLayerImpl(VendingMachineDao dao, VendingMachineAuditDao auditDao) {
         this.dao = dao;
+        this.auditDao = auditDao;
     }
 
     @Override
     public void createItem(VendingItem item) throws
             VendingMachineDuplicateNameException,
             VendingMachineDataValidationException,
-            VendingMachinePersistenceException {
+            VendingMachinePersistenceException,
+            VendingMachineDaoException {
 
-        if (dao.getItem(item.getStudentId()) != null) {
+        if (dao.getItem(item.getName()) != null) {
             throw new VendingMachineDuplicateNameException(
-                    "ERROR: Could not create student.  Student Id "
-                            + item.getStudentId()
+                    "ERROR: Could not create vending item.  Item "
+                            + item.getName()
                             + " already exists");
         }
 
-        // Now validate all the fields on the given Student object.
-        // This method will throw an
-        // exception if any of the validation rules are violated.
         validateItemData(item);
 
-        // We passed all our business rules checks so go ahead
-        // and persist the Student object
-        dao.addItem(item.getStudentId(), item);
+        dao.addItem(item.getName(), item);
 
+        auditDao.writeAuditEntry("Vending Item " + item.getName() + " CREATED.");
     }
 
     @Override
-    public List<VendingItem> getAllItems() throws VendingMachinePersistenceException {
-        return null;
+    public List<VendingItem> getAllItems() throws
+            VendingMachinePersistenceException,
+            VendingMachineDaoException {
+
+        return dao.getAllItems();
     }
 
     @Override
-    public VendingItem getVendingItem(String itemName) throws VendingMachinePersistenceException {
-        return null;
+    public VendingItem getVendingItem(String itemName) throws
+            VendingMachinePersistenceException,
+            VendingMachineDaoException {
+
+        return dao.getItem(itemName);
     }
 
     @Override
-    public VendingItem removeVendingItem(String itemName) throws VendingMachinePersistenceException {
-        return null;
+    public VendingItem removeVendingItem(String itemName) throws
+            VendingMachinePersistenceException,
+            VendingMachineDaoException {
+
+        auditDao.writeAuditEntry("VendingItem " + itemName + " REMOVED.");
+        return dao.removeItem(itemName);
     }
 
     private void validateItemData(VendingItem item) throws VendingMachineDataValidationException {
-        if (item.getFirstName() == null
-                || item.getFirstName().trim().length() == 0
-                || item.getLastName() == null
-                || item.getLastName().trim().length() == 0
-                || item.getCohort() == null
-                || item.getCohort().trim().length() == 0) {
+        if (item.getName() == null
+                || item.getName().trim().length() == 0
+                || item.getPrice() == null
+                || item.getPrice().compareTo(new BigDecimal(0)) < 0
+                || item.getCount() < 0) {
 
             throw new VendingMachineDataValidationException(
-                    "ERROR: All fields [First Name, Last Name, Cohort] are required.");
+                    "ERROR: All fields [Name, Price, Count] are required.");
         }
     }
 }

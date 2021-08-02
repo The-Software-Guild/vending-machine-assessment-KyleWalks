@@ -3,6 +3,11 @@ package com.sg.vendingmachine.dto;
 import java.math.BigDecimal;
 
 public class Change {
+
+    private enum Coins {
+        PENNY, NICKEL, DIME, QUARTER
+    }
+
     private VendingItem item;
     private BigDecimal amountEntered;
     private BigDecimal change;

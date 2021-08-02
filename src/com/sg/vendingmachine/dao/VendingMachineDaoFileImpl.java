@@ -13,6 +13,7 @@ import com.sg.vendingmachine.dto.VendingItem;
 import com.sg.vendingmachine.ui.UserIO;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.*;
 
 public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
@@ -45,21 +46,9 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
 
         VendingItem vendingItemFromFile = new VendingItem(itemName);
 
-        // Check if optional input was entered.
-        if (!itemTokens[1].equals(" "))
-            vendingItemFromFile.setRelDate(itemTokens[1]);
+        vendingItemFromFile.setPrice(new BigDecimal(itemTokens[1]));
 
-        if (!itemTokens[2].equals(" "))
-            vendingItemFromFile.setDirector(itemTokens[2]);
-
-        if (!itemTokens[3].equals(" "))
-            vendingItemFromFile.setStudio(itemTokens[3]);
-
-        if (!itemTokens[4].equals(" "))
-            vendingItemFromFile.setUserNote(itemTokens[4]);
-
-        if (!itemTokens[5].equals(" "))
-            vendingItemFromFile.setMpaaRating(itemTokens[5]);
+        vendingItemFromFile.setCount(Integer.parseInt(itemTokens[2]));
 
         return vendingItemFromFile;
     }
@@ -75,17 +64,11 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
      */
     private String marshallItem(VendingItem aVendingItem){
 
-        String itemAsText = aVendingItem.getTitle() + DELIMITER;
+        String itemAsText = aVendingItem.getName() + DELIMITER;
 
-        itemAsText += aVendingItem.getRelDate() + DELIMITER;
+        itemAsText += aVendingItem.getPrice() + DELIMITER;
 
-        itemAsText += aVendingItem.getDirector() + DELIMITER;
-
-        itemAsText += aVendingItem.getStudio() + DELIMITER;
-
-        itemAsText += aVendingItem.getUserNote() + DELIMITER;
-
-        itemAsText += aVendingItem.getMpaaRating();
+        itemAsText += aVendingItem.getCount();
 
         return itemAsText;
     }
@@ -103,7 +86,7 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
             out = new PrintWriter(new FileWriter(VENDING_MACHINE_TXT));
         } catch (IOException e) {
             throw new VendingMachineDaoException(
-                    "Could not save dvd data.", e);
+                    "Could not save vending machine data.", e);
         }
 
         String itemAsText;
@@ -135,7 +118,7 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
                             new FileReader(VENDING_MACHINE_TXT)));
         } catch (FileNotFoundException e) {
             throw new VendingMachineDaoException(
-                    "-_- Could not load vending machine data into memory.", e);
+                    "Could not load vending machine data into memory.", e);
         }
 
         String currentLine;
@@ -147,7 +130,7 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
 
             currentVendingItem = unmarshallItem(currentLine);
 
-            vendingItems.put(currentVendingItem.getItemName(), currentVendingItem);
+            vendingItems.put(currentVendingItem.getName(), currentVendingItem);
         }
 
         scanner.close();
@@ -394,7 +377,7 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
 
     /**
      *
-     * A slightly more complex method that takes in a message to display on the console, 
+     * A slightly more complex method that takes in a message to display on the console,
      * and continually reprompts the user with that message until they enter a double
      * within the specified min/max range to be returned as the answer to that message.
      *
@@ -409,6 +392,48 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
         do {
             result = readDouble(msgPrompt);
         } while (result < min || result > max);
+        return result;
+    }
+
+    /**
+     *
+     * A simple method that takes in a message to display on the console,
+     * and continually reprompts the user with that message until they enter a BigDecimal
+     * to be returned as the answer to that message.
+     *
+     * @param prompt - String explaining what information you want from the user.
+     * @return the answer to the message as BigDecimal
+     */
+    @Override
+    public BigDecimal readBigDecimal(String prompt) {
+        while (true) {
+            try {
+                return new BigDecimal(this.readString(prompt));
+            } catch (NumberFormatException e) {
+                this.print("Input error. Please try again.");
+            }
+        }
+    }
+
+    /**
+     *
+     * A slightly more complex method that takes in a message to display on the console,
+     * and continually reprompts the user with that message until they enter a BigDecimal
+     * within the specified min/max range to be returned as the answer to that message.
+     *
+     * @param prompt - String explaining what information you want from the user.
+     * @param min - minimum acceptable value for return
+     * @param max - maximum acceptable value for return
+     * @return a BigDecimal value as an answer to the message prompt within the min/max range
+     */
+    @Override
+    public BigDecimal readBigDecimal(String prompt, BigDecimal min, BigDecimal max) {
+        BigDecimal result;
+
+        do {
+            result = readBigDecimal(prompt);
+        } while (result.compareTo(min) < 0 || result.compareTo(max) > 0);
+
         return result;
     }
 

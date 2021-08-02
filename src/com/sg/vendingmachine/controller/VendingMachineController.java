@@ -1,8 +1,11 @@
 package com.sg.vendingmachine.controller;
 
-import com.sg.vendingmachine.dao.VendingMachineDao;
 import com.sg.vendingmachine.dao.VendingMachineDaoException;
 import com.sg.vendingmachine.dto.VendingItem;
+import com.sg.vendingmachine.service.VendingMachineDataValidationException;
+import com.sg.vendingmachine.service.VendingMachineDuplicateNameException;
+import com.sg.vendingmachine.service.VendingMachinePersistenceException;
+import com.sg.vendingmachine.service.VendingMachineServiceLayerImpl;
 import com.sg.vendingmachine.ui.VendingMachineView;
 
 import java.util.List;
@@ -10,10 +13,10 @@ import java.util.List;
 public class VendingMachineController {
 
     private final VendingMachineView view;
-    private final VendingMachineDao dao;
+    private final VendingMachineServiceLayerImpl service;
 
-    public VendingMachineController(VendingMachineDao dao, VendingMachineView view) {
-        this.dao = dao;
+    public VendingMachineController(VendingMachineServiceLayerImpl service, VendingMachineView view) {
+        this.service = service;
         this.view = view;
     }
 
@@ -25,6 +28,8 @@ public class VendingMachineController {
         boolean keepGoing = true;
         int menuSelection;
         try {
+            listItems();
+
             while (keepGoing) {
 
                 menuSelection = getMenuSelection();
@@ -54,71 +59,73 @@ public class VendingMachineController {
 
             }
             exitMessage();
-        } catch (VendingMachineDaoException e) {
+        } catch (VendingMachineDaoException | VendingMachinePersistenceException | VendingMachineDataValidationException | VendingMachineDuplicateNameException e) {
             view.displayErrorMessage(e.getMessage());
         }
     }
 
     /**
-     * Creates a new DVD.
+     * Creates a new VendingItem.
      *
      * @throws VendingMachineDaoException if loading/saving to the library fails.
      */
-    private void createItem() throws VendingMachineDaoException {
+    private void createItem() throws VendingMachineDaoException, VendingMachinePersistenceException, VendingMachineDataValidationException, VendingMachineDuplicateNameException {
         view.displayCreateItemBanner();
         VendingItem newVendingItem = view.getNewItemInfo();
-        dao.addItem(newVendingItem.getItemName(), newVendingItem);
+        service.createItem(newVendingItem);
         view.displayCreateSuccessBanner();
     }
 
     /**
      * Removes an entry from the database by using the
-     * movie's title.
+     * VendingItem name.
      *
      * @throws VendingMachineDaoException if file saving/loading fails
      */
-    private void removeItem() throws VendingMachineDaoException {
+    private void removeItem() throws VendingMachineDaoException, VendingMachinePersistenceException {
         view.displayRemoveItemBanner();
         String itemName = view.getItemNameChoice();
-        VendingItem removedVendingItem = dao.removeItem(itemName);
+        VendingItem removedVendingItem = service.removeVendingItem(itemName);
         view.displayRemoveResult(removedVendingItem);
     }
 
     /**
-     * Lists all DVDs in the data base.
+     * Lists all VendingItems in the database.
      *
      * @throws VendingMachineDaoException if loading the database fails.
      */
-    private void listItems() throws VendingMachineDaoException {
+    private void listItems() throws VendingMachineDaoException, VendingMachinePersistenceException {
         view.displayDisplayAllBanner();
-        List<VendingItem> vendingItemList = dao.getAllItems();
+        List<VendingItem> vendingItemList = service.getAllItems();
         view.displayItemList(vendingItemList);
     }
 
     /**
-     * Displays the DVD properties.
+     * Displays the VendingItem properties.
      *
      * @throws VendingMachineDaoException if loading the database fails
      */
-    private void viewItem() throws VendingMachineDaoException {
+    private void viewItem() throws VendingMachineDaoException, VendingMachinePersistenceException {
         view.displayDisplayItemBanner();
 
         String itemName = view.getItemNameChoice();
-        VendingItem vendingItem = dao.getItem(itemName);
+        VendingItem vendingItem = service.getVendingItem(itemName);
 
         view.displayItem(vendingItem);
     }
 
     /**
-     * Edits a property of a DVD based on user integer input.
+     * Edits a property of a VendingItem based on user integer input.
      *
      * @throws VendingMachineDaoException if loading/saving the database fails
      */
-    private void editItem() throws VendingMachineDaoException {
+    private void editItem() throws VendingMachineDaoException, VendingMachinePersistenceException, VendingMachineDataValidationException, VendingMachineDuplicateNameException {
         view.displayDisplayItemBanner();
 
         String itemName = view.getItemNameChoice();
-        VendingItem vendingItem = dao.getItem(itemName);
+        VendingItem vendingItem = service.getVendingItem(itemName);
+        if (vendingItem == null) // TODO: Change to loop input
+            return;
 
         view.displayItem(vendingItem);
 
@@ -126,14 +133,14 @@ public class VendingMachineController {
 
         VendingItem changedVendingItem = new VendingItem(vendingItem);
 
-        if (editChoice != 7)
+        if (editChoice != 4)
             changedVendingItem = view.getNewItemInfo(changedVendingItem, editChoice);
         else
             return;
 
-        dao.removeItem(vendingItem.getItemName());
+        service.removeVendingItem(vendingItem.getName());
 
-        dao.addItem(changedVendingItem.getItemName(), changedVendingItem);
+        service.createItem(changedVendingItem);
     }
 
     private void unknownCommand() {

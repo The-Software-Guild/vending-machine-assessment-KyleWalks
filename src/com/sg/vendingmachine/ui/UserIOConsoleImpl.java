@@ -1,5 +1,6 @@
 package com.sg.vendingmachine.ui;
 
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class UserIOConsoleImpl implements UserIO {
@@ -208,4 +209,25 @@ public class UserIOConsoleImpl implements UserIO {
         return result;
     }
 
+    @Override
+    public BigDecimal readBigDecimal(String prompt) {
+        while (true) {
+            try {
+                return new BigDecimal(this.readString(prompt));
+            } catch (NumberFormatException e) {
+                this.print("Input error. Please try again.");
+            }
+        }
+    }
+
+    @Override
+    public BigDecimal readBigDecimal(String prompt, BigDecimal min, BigDecimal max) {
+        BigDecimal result;
+
+        do {
+            result = readBigDecimal(prompt);
+        } while (result.compareTo(min) < 0 || result.compareTo(max) > 0);
+
+        return result;
+    }
 }

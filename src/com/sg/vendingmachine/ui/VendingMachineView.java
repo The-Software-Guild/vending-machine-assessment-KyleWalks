@@ -2,6 +2,7 @@ package com.sg.vendingmachine.ui;
 
 import com.sg.vendingmachine.dto.VendingItem;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class VendingMachineView {
@@ -20,11 +21,11 @@ public class VendingMachineView {
     public int printMenuAndGetSelection() {
 
         io.print("Main Menu");
-        io.print("1. List DVDs");
-        io.print("2. View a DVD");
-        io.print("3. Create New DVD");
-        io.print("4. Remove a DVD");
-        io.print("5. Edit a DVD");
+        io.print("1. List vending items");
+        io.print("2. View a vending item");
+        io.print("3. Create New vending item");
+        io.print("4. Remove a vending item");
+        io.print("5. Edit a vending item");
         io.print("6. Exit");
 
         return io.readInt("Please select from the above choices.", 1, 6);
@@ -39,50 +40,33 @@ public class VendingMachineView {
     public int printEditMenuAndGetSelection() {
 
         io.print("Edit Menu");
-        io.print("1. Title");
-        io.print("2. Release Date");
-        io.print("3. Director");
-        io.print("4. Studio");
-        io.print("5. Note");
-        io.print("6. MPAA Rating");
-        io.print("7. Exit Menu");
+        io.print("1. Name");
+        io.print("2. Price");
+        io.print("3. Count");
+        io.print("4. Exit Menu");
 
-        return io.readInt("Please select from the above choices.", 1, 7);
+        return io.readInt("Please select from the above choices.", 1, 4);
     }
 
     /**
-     * Retrieves the properties of the DVD being
+     * Retrieves the properties of the vending item being
      * created.
      *
-     * @return the DVD that was created.
+     * @return the vending item that was created.
      */
     public VendingItem getNewItemInfo() {
         // Required
-        String itemName = io.readString("Please enter DVD title");
+        String itemName = io.readString("Please enter vending item name");
         while (!checkString(itemName))
-            itemName = io.readString("Please enter DVD title");
+            itemName = io.readString("Please enter vending item name");
 
-        // Optional
-        String relDate = io.readString("[Optional]Please enter the release date(YYYY)");
-        String director = io.readString("[Optional]Please enter the director's name");
-        String studio = io.readString("[Optional]Please enter the studio");
-        String userEntry = io.readString("[Optional]Please enter your rating/note");
-        String mpaaRating = io.readString("[Optional]Please enter the MPAA Rating");
-
-        // Check for empty optional input.
-        relDate = !relDate.isEmpty() ? relDate : " ";
-        director = !director.isEmpty() ? relDate : " ";
-        studio = !studio.isEmpty() ? relDate : " ";
-        userEntry = !userEntry.isEmpty() ? relDate : " ";
-        mpaaRating = !mpaaRating.isEmpty() ? relDate : " ";
+        BigDecimal price = io.readBigDecimal("Please enter the price");
+        int count = io.readInt("Please enter the item count");
 
         VendingItem currentVendingItem = new VendingItem(itemName);
 
-        currentVendingItem.setRelDate(relDate);
-        currentVendingItem.setDirector(director);
-        currentVendingItem.setStudio(studio);
-        currentVendingItem.setUserNote(userEntry);
-        currentVendingItem.setMpaaRating(mpaaRating);
+        currentVendingItem.setPrice(price);
+        currentVendingItem.setCount(count);
 
         return currentVendingItem;
     }
@@ -91,9 +75,9 @@ public class VendingMachineView {
      * Retrieves the property value being changed by
      * the user.
      *
-     * @param currVendingItem The DVD that is being edited.
+     * @param currVendingItem The vending item that is being edited.
      * @param propChoice Integer representing the property to be changed.
-     * @return the altered DVD.
+     * @return the altered vending item.
      */
     public VendingItem getNewItemInfo(VendingItem currVendingItem, int propChoice) {
         String propChange = "";
@@ -101,19 +85,13 @@ public class VendingMachineView {
         while (!checkString(propChange)) {
             switch (propChoice) {
                 case 1:
-                    propChange = io.readString("Please enter DVD title");
+                    propChange = io.readString("Please enter vending item name");
                     break;
                 case 2:
-                    propChange = io.readString("Please enter the release date(YYYY)");
+                    propChange = io.readString("Please enter the price");
                     break;
                 case 3:
-                    propChange = io.readString("Please enter the director's name");
-                    break;
-                case 4:
-                    propChange = io.readString("Please enter the studio");
-                    break;
-                case 5:
-                    propChange = io.readString("Please enter your rating/note");
+                    propChange = io.readString("Please enter the item count");
                     break;
                 default:
                     return currVendingItem;
@@ -122,19 +100,13 @@ public class VendingMachineView {
 
         switch (propChoice) {
             case 1:
-                currVendingItem.setTitle(propChange);
+                currVendingItem.setName(propChange);
                 break;
             case 2:
-                currVendingItem.setRelDate(propChange);
+                currVendingItem.setPrice(new BigDecimal(propChange));
                 break;
             case 3:
-                currVendingItem.setDirector(propChange);
-                break;
-            case 4:
-                currVendingItem.setStudio(propChange);
-                break;
-            case 5:
-                currVendingItem.setUserNote(propChange);
+                currVendingItem.setCount(Integer.parseInt(propChange));
                 break;
             default:
                 break;
@@ -144,76 +116,72 @@ public class VendingMachineView {
     }
 
     public void displayCreateItemBanner() {
-        io.print("=== Create DVD ===");
+        io.print("=== Create vending item ===");
     }
 
     public void displayCreateSuccessBanner() {
-        io.readString("DVD successfully created.  Please hit enter to continue");
+        io.readString("vending item successfully created.  Please hit enter to continue");
     }
 
     /**
-     * Displays a compact summary of the DVDs
+     * Displays a compact summary of the vending items
      * in the library.
      *
-     * @param vendingItemList List of DVDs in the library.
+     * @param vendingItemList List of vending items in the library.
      */
     public void displayItemList(List<VendingItem> vendingItemList) {
         for (VendingItem currentVendingItem : vendingItemList) {
-            String dvdInfo = String.format("%s : %s %s",
-                    currentVendingItem.getTitle(),
-                    currentVendingItem.getRelDate(),
-                    currentVendingItem.getDirector());
+            System.out.printf("%10s: %-15s\n", "Name", currentVendingItem.getName());
+            System.out.printf("%10s: $%-15s\n", "Price", currentVendingItem.getPrice());
+            System.out.printf("%10s: #%-15s\n", "Count", currentVendingItem.getCount());
 
-            io.print(dvdInfo);
+            io.print("");
         }
         io.readString("Please hit enter to continue.");
     }
 
     public void displayRemoveItemBanner() {
-        io.print("=== Remove DVD ===");
+        io.print("=== Remove vending item ===");
     }
 
     public void displayRemoveResult(VendingItem vendingItemRecord) {
         if(vendingItemRecord != null){
-            io.print("DVD successfully removed.");
+            io.print("vending item successfully removed.");
         }else{
-            io.print("No such DVD.");
+            io.print("No such vending item.");
         }
         io.readString("Please hit enter to continue.");
     }
 
     public void displayDisplayItemBanner() {
-        io.print("=== Display DVD ===");
+        io.print("=== Display vending item ===");
     }
 
     public String getItemNameChoice() {
-        return io.readString("Please enter the DVD title.");
+        return io.readString("Please enter the vending item name.");
     }
 
     public String getItemEditChoice() {
         io.print("");
-        return io.readString("Please enter the DVD property you would like to edit.");
+        return io.readString("Please enter the vending item property you would like to edit.");
     }
 
     /**
-     * Formatted output of the properties of a DVD.
+     * Formatted output of the properties of a vending item.
      *
-     * @param vendingItem the DVD to be displayed.
+     * @param vendingItem the vending item to be displayed.
      */
     public void displayItem(VendingItem vendingItem) {
         io.print("");
 
         if (vendingItem != null) {
-            System.out.printf("%20s: %-15s\n", "Title", vendingItem.getTitle());
-            System.out.printf("%20s: %-15s\n", "Release Date", vendingItem.getRelDate());
-            System.out.printf("%20s: %-15s\n", "Director", vendingItem.getDirector());
-            System.out.printf("%20s: %-15s\n", "Studio", vendingItem.getStudio());
-            System.out.printf("%20s: %-15s\n", "User Note", vendingItem.getUserNote());
-            System.out.printf("%20s: %-15s\n", "MPAA Rating", vendingItem.getMpaaRating());
+            System.out.printf("%20s: %-15s\n", "Name", vendingItem.getName());
+            System.out.printf("%20s: %-15s\n", "Price", vendingItem.getPrice());
+            System.out.printf("%20s: %-15s\n", "Count", vendingItem.getCount());
 
             io.print("");
         } else {
-            io.print("No such DVD.");
+            io.print("No such vending item.");
         }
 
         io.readString("Please hit enter to continue.");
@@ -233,7 +201,7 @@ public class VendingMachineView {
     }
 
     public void displayDisplayAllBanner() {
-        io.print("=== Display All DVDs ===");
+        io.print("=== Display All vending items ===");
     }
 
     /**

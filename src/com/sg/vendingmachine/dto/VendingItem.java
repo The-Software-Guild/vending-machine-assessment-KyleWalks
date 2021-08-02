@@ -3,37 +3,47 @@ package com.sg.vendingmachine.dto;
 import java.math.BigDecimal;
 
 public class VendingItem {
-    private String itemName;
-    private BigDecimal itemCost;
-    private int invCount;
+    private String name;
+    private BigDecimal price;
+    private int count;
+
+    public VendingItem(String itemName) {
+        this.name = itemName;
+    }
 
     public VendingItem(String itemName, BigDecimal itemCost, int invCount) {
-        this.itemName = itemName;
-        this.itemCost = itemCost;
-        this.invCount = invCount;
+        this.name = itemName;
+        this.price = itemCost;
+        this.count = invCount;
     }
 
-    public String getItemName() {
-        return itemName;
+    public VendingItem(VendingItem item) {
+        this.name = item.name;
+        this.price = item.price;
+        this.count = item.count;
     }
 
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
+    public String getName() {
+        return name;
     }
 
-    public BigDecimal getItemCost() {
-        return itemCost;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setItemCost(BigDecimal itemCost) {
-        this.itemCost = itemCost;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public int getInvCount() {
-        return invCount;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
-    public void setInvCount(int invCount) {
-        this.invCount = invCount;
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }
