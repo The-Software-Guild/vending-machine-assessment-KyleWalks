@@ -31,96 +31,12 @@ public class VendingMachineView {
         return io.readInt("Please select from the above choices.", 1, 6);
     }
 
-    /**
-     * Displays the menu used to choose which property
-     * is to be edited by the user.
-     *
-     * @return the user choice as an integer.
-     */
-    public int printEditMenuAndGetSelection() {
+    public BigDecimal getCurrency() {
+        BigDecimal currency;
 
-        io.print("Edit Menu");
-        io.print("1. Name");
-        io.print("2. Price");
-        io.print("3. Count");
-        io.print("4. Exit Menu");
+        currency = io.readBigDecimal("Please enter a sum of money.", new BigDecimal(0));
 
-        return io.readInt("Please select from the above choices.", 1, 4);
-    }
-
-    /**
-     * Retrieves the properties of the vending item being
-     * created.
-     *
-     * @return the vending item that was created.
-     */
-    public VendingItem getNewItemInfo() {
-        // Required
-        String itemName = io.readString("Please enter vending item name");
-        while (!checkString(itemName))
-            itemName = io.readString("Please enter vending item name");
-
-        BigDecimal price = io.readBigDecimal("Please enter the price");
-        int count = io.readInt("Please enter the item count");
-
-        VendingItem currentVendingItem = new VendingItem(itemName);
-
-        currentVendingItem.setPrice(price);
-        currentVendingItem.setCount(count);
-
-        return currentVendingItem;
-    }
-
-    /**
-     * Retrieves the property value being changed by
-     * the user.
-     *
-     * @param currVendingItem The vending item that is being edited.
-     * @param propChoice Integer representing the property to be changed.
-     * @return the altered vending item.
-     */
-    public VendingItem getNewItemInfo(VendingItem currVendingItem, int propChoice) {
-        String propChange = "";
-
-        while (!checkString(propChange)) {
-            switch (propChoice) {
-                case 1:
-                    propChange = io.readString("Please enter vending item name");
-                    break;
-                case 2:
-                    propChange = io.readString("Please enter the price");
-                    break;
-                case 3:
-                    propChange = io.readString("Please enter the item count");
-                    break;
-                default:
-                    return currVendingItem;
-            }
-        }
-
-        switch (propChoice) {
-            case 1:
-                currVendingItem.setName(propChange);
-                break;
-            case 2:
-                currVendingItem.setPrice(new BigDecimal(propChange));
-                break;
-            case 3:
-                currVendingItem.setCount(Integer.parseInt(propChange));
-                break;
-            default:
-                break;
-        }
-
-        return currVendingItem;
-    }
-
-    public void displayCreateItemBanner() {
-        io.print("=== Create vending item ===");
-    }
-
-    public void displayCreateSuccessBanner() {
-        io.readString("vending item successfully created.  Please hit enter to continue");
+        return currency;
     }
 
     /**
@@ -137,33 +53,14 @@ public class VendingMachineView {
 
             io.print("");
         }
-        io.readString("Please hit enter to continue.");
     }
 
-    public void displayRemoveItemBanner() {
-        io.print("=== Remove vending item ===");
-    }
-
-    public void displayRemoveResult(VendingItem vendingItemRecord) {
-        if(vendingItemRecord != null){
-            io.print("vending item successfully removed.");
-        }else{
-            io.print("No such vending item.");
-        }
-        io.readString("Please hit enter to continue.");
-    }
-
-    public void displayDisplayItemBanner() {
-        io.print("=== Display vending item ===");
+    public void displayChangeResult(BigDecimal change) {
+        io.print("Your change is: $" + change);
     }
 
     public String getItemNameChoice() {
         return io.readString("Please enter the vending item name.");
-    }
-
-    public String getItemEditChoice() {
-        io.print("");
-        return io.readString("Please enter the vending item property you would like to edit.");
     }
 
     /**
@@ -202,6 +99,10 @@ public class VendingMachineView {
 
     public void displayDisplayAllBanner() {
         io.print("=== Display All vending items ===");
+    }
+
+    public void displayEnterMoneyBanner() {
+        io.print("=== Enter Sum of Money ===");
     }
 
     /**

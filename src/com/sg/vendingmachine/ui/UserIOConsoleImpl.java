@@ -221,12 +221,12 @@ public class UserIOConsoleImpl implements UserIO {
     }
 
     @Override
-    public BigDecimal readBigDecimal(String prompt, BigDecimal min, BigDecimal max) {
+    public BigDecimal readBigDecimal(String prompt, BigDecimal min) {
         BigDecimal result;
 
         do {
             result = readBigDecimal(prompt);
-        } while (result.compareTo(min) < 0 || result.compareTo(max) > 0);
+        } while (result.compareTo(min) < 0);
 
         return result;
     }

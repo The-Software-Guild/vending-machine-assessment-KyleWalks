@@ -188,14 +188,16 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
      * @throws VendingMachineDaoException if loading/saving the library fails.
      */
     @Override
-    public VendingItem removeItem(String itemName) throws VendingMachineDaoException {
+    public VendingItem dispenseItem(String itemName) throws VendingMachineDaoException {
         loadVendingMachine();
 
-        VendingItem removedVendingItem = vendingItems.remove(itemName);
+        VendingItem dispensedVendingItem = vendingItems.get(itemName);
+        dispensedVendingItem.setCount(dispensedVendingItem.getCount() - 1);
+        vendingItems.put(itemName, dispensedVendingItem);
 
         writeVendingMachine();
 
-        return removedVendingItem;
+        return dispensedVendingItem;
     }
 
     /**
@@ -423,16 +425,15 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
      *
      * @param prompt - String explaining what information you want from the user.
      * @param min - minimum acceptable value for return
-     * @param max - maximum acceptable value for return
      * @return a BigDecimal value as an answer to the message prompt within the min/max range
      */
     @Override
-    public BigDecimal readBigDecimal(String prompt, BigDecimal min, BigDecimal max) {
+    public BigDecimal readBigDecimal(String prompt, BigDecimal min) {
         BigDecimal result;
 
         do {
             result = readBigDecimal(prompt);
-        } while (result.compareTo(min) < 0 || result.compareTo(max) > 0);
+        } while (result.compareTo(min) < 0);
 
         return result;
     }

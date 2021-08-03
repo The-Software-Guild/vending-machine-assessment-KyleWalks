@@ -51,6 +51,6 @@ public interface VendingMachineDao {
      * was associated with the given VendingItem name
      * @throws VendingMachineDaoException
      */
-    VendingItem removeItem(String itemName)
+    VendingItem dispenseItem(String itemName)
             throws VendingMachineDaoException;
 }

@@ -3,6 +3,7 @@ package com.sg.vendingmachine.service;
 import com.sg.vendingmachine.dao.VendingMachineAuditDao;
 import com.sg.vendingmachine.dao.VendingMachineDao;
 import com.sg.vendingmachine.dao.VendingMachineDaoException;
+import com.sg.vendingmachine.dao.VendingMachineNoItemInventoryException;
 import com.sg.vendingmachine.dto.VendingItem;
 
 import java.math.BigDecimal;
@@ -56,12 +57,15 @@ public class VendingMachineServiceLayerImpl implements VendingMachineServiceLaye
     }
 
     @Override
-    public VendingItem removeVendingItem(String itemName) throws
+    public VendingItem dispenseVendingItem(String itemName) throws
             VendingMachinePersistenceException,
-            VendingMachineDaoException {
+            VendingMachineDaoException, VendingMachineNoItemInventoryException {
 
-        auditDao.writeAuditEntry("VendingItem " + itemName + " REMOVED.");
-        return dao.removeItem(itemName);
+        if (dao.getItem(itemName).getCount() == 0)
+            throw new VendingMachineNoItemInventoryException("Item is out of stock.");
+
+        auditDao.writeAuditEntry("VendingItem " + itemName + " DISPENSED.");
+        return dao.dispenseItem(itemName);
     }
 
     private void validateItemData(VendingItem item) throws VendingMachineDataValidationException {

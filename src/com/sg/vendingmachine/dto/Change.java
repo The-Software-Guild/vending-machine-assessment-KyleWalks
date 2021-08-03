@@ -19,13 +19,19 @@ public class Change {
         this.change = calcChange();
     }
 
+    public Change(VendingItem item, BigDecimal amount, BigDecimal change) {
+        this.item = item;
+        this.amountEntered = amount;
+        this.change = change;
+    }
+
     private BigDecimal calcChange() {
         BigDecimal price = item.getPrice();
-        if (price.compareTo(amountEntered) < 0)
+        if (price.compareTo(amountEntered) > 0)
             return null;
 
         this.change = amountEntered.subtract(price);
-        this.change = change.round(new MathContext(2));
+        this.change = change.round(new MathContext(5));
 
         return this.change;
     }

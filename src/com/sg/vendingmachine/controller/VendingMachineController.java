@@ -1,13 +1,13 @@
 package com.sg.vendingmachine.controller;
 
 import com.sg.vendingmachine.dao.VendingMachineDaoException;
+import com.sg.vendingmachine.dao.VendingMachineNoItemInventoryException;
+import com.sg.vendingmachine.dto.Change;
 import com.sg.vendingmachine.dto.VendingItem;
-import com.sg.vendingmachine.service.VendingMachineDataValidationException;
-import com.sg.vendingmachine.service.VendingMachineDuplicateNameException;
-import com.sg.vendingmachine.service.VendingMachinePersistenceException;
-import com.sg.vendingmachine.service.VendingMachineServiceLayerImpl;
+import com.sg.vendingmachine.service.*;
 import com.sg.vendingmachine.ui.VendingMachineView;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class VendingMachineController {
@@ -26,67 +26,49 @@ public class VendingMachineController {
      */
     public void run() {
         boolean keepGoing = true;
-        int menuSelection;
+        VendingItem currItem;
+        BigDecimal enteredMoney;
         try {
-            listItems();
-
             while (keepGoing) {
-
-                menuSelection = getMenuSelection();
-
-                switch (menuSelection) {
-                    case 1:
-                        listItems();
-                        break;
-                    case 2:
-                        viewItem();
-                        break;
-                    case 3:
-                        createItem();
-                        break;
-                    case 4:
-                        removeItem();
-                        break;
-                    case 5:
-                        editItem();
-                        break;
-                    case 6:
-                        keepGoing = false;
-                        break;
-                    default:
-                        unknownCommand();
-                }
-
+                listItems();
+                // Query for money
+                enteredMoney = enterMoney();
+                // Query item choice
+                currItem = getChoice();
+                dispenseItem(currItem, enteredMoney);
+                keepGoing = false;
             }
             exitMessage();
-        } catch (VendingMachineDaoException | VendingMachinePersistenceException | VendingMachineDataValidationException | VendingMachineDuplicateNameException e) {
+        } catch (VendingMachineDaoException | VendingMachinePersistenceException | VendingMachineInsufficientFundsException | VendingMachineNoItemInventoryException e) {
             view.displayErrorMessage(e.getMessage());
         }
     }
 
-    /**
-     * Creates a new VendingItem.
-     *
-     * @throws VendingMachineDaoException if loading/saving to the library fails.
-     */
-    private void createItem() throws VendingMachineDaoException, VendingMachinePersistenceException, VendingMachineDataValidationException, VendingMachineDuplicateNameException {
-        view.displayCreateItemBanner();
-        VendingItem newVendingItem = view.getNewItemInfo();
-        service.createItem(newVendingItem);
-        view.displayCreateSuccessBanner();
+    private BigDecimal enterMoney() {
+        view.displayEnterMoneyBanner();
+        return view.getCurrency();
     }
 
-    /**
-     * Removes an entry from the database by using the
-     * VendingItem name.
-     *
-     * @throws VendingMachineDaoException if file saving/loading fails
-     */
-    private void removeItem() throws VendingMachineDaoException, VendingMachinePersistenceException {
-        view.displayRemoveItemBanner();
+    private VendingItem getChoice() throws VendingMachineDaoException, VendingMachinePersistenceException {
         String itemName = view.getItemNameChoice();
-        VendingItem removedVendingItem = service.removeVendingItem(itemName);
-        view.displayRemoveResult(removedVendingItem);
+        VendingItem selItem = service.getVendingItem(itemName);
+
+        view.displayItem(selItem);
+
+        return selItem;
+    }
+
+    private BigDecimal dispenseItem(VendingItem item, BigDecimal enteredMoney) throws VendingMachineInsufficientFundsException, VendingMachineDaoException, VendingMachinePersistenceException, VendingMachineNoItemInventoryException {
+        BigDecimal change = new Change(item, enteredMoney).getChange();
+
+        if (change == null)
+            throw new VendingMachineInsufficientFundsException("Insufficient funds entered.");
+
+        service.dispenseVendingItem(item.getName());
+
+        view.displayChangeResult(change);
+
+        return change;
     }
 
     /**
@@ -98,49 +80,6 @@ public class VendingMachineController {
         view.displayDisplayAllBanner();
         List<VendingItem> vendingItemList = service.getAllItems();
         view.displayItemList(vendingItemList);
-    }
-
-    /**
-     * Displays the VendingItem properties.
-     *
-     * @throws VendingMachineDaoException if loading the database fails
-     */
-    private void viewItem() throws VendingMachineDaoException, VendingMachinePersistenceException {
-        view.displayDisplayItemBanner();
-
-        String itemName = view.getItemNameChoice();
-        VendingItem vendingItem = service.getVendingItem(itemName);
-
-        view.displayItem(vendingItem);
-    }
-
-    /**
-     * Edits a property of a VendingItem based on user integer input.
-     *
-     * @throws VendingMachineDaoException if loading/saving the database fails
-     */
-    private void editItem() throws VendingMachineDaoException, VendingMachinePersistenceException, VendingMachineDataValidationException, VendingMachineDuplicateNameException {
-        view.displayDisplayItemBanner();
-
-        String itemName = view.getItemNameChoice();
-        VendingItem vendingItem = service.getVendingItem(itemName);
-        if (vendingItem == null) // TODO: Change to loop input
-            return;
-
-        view.displayItem(vendingItem);
-
-        int editChoice = view.printEditMenuAndGetSelection();
-
-        VendingItem changedVendingItem = new VendingItem(vendingItem);
-
-        if (editChoice != 4)
-            changedVendingItem = view.getNewItemInfo(changedVendingItem, editChoice);
-        else
-            return;
-
-        service.removeVendingItem(vendingItem.getName());
-
-        service.createItem(changedVendingItem);
     }
 
     private void unknownCommand() {

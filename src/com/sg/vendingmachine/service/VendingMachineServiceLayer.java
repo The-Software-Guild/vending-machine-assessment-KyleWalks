@@ -1,6 +1,7 @@
 package com.sg.vendingmachine.service;
 
 import com.sg.vendingmachine.dao.VendingMachineDaoException;
+import com.sg.vendingmachine.dao.VendingMachineNoItemInventoryException;
 import com.sg.vendingmachine.dto.VendingItem;
 
 import java.util.List;
@@ -17,6 +18,6 @@ public interface VendingMachineServiceLayer {
     VendingItem getVendingItem(String itemName) throws
             VendingMachinePersistenceException, VendingMachineDaoException;
 
-    VendingItem removeVendingItem(String itemName) throws
-            VendingMachinePersistenceException, VendingMachineDaoException;
+    VendingItem dispenseVendingItem(String itemName) throws
+            VendingMachinePersistenceException, VendingMachineDaoException, VendingMachineNoItemInventoryException;
 }
