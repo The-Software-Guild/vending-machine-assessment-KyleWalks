@@ -9,6 +9,8 @@ public class VendingItem {
 
     public VendingItem(String itemName) {
         this.name = itemName;
+        this.price = new BigDecimal("0");
+        this.count = 0;
     }
 
     public VendingItem(String itemName, BigDecimal itemCost, int invCount) {

@@ -11,6 +11,12 @@ public class VendingMachineAuditDaoFileImpl implements VendingMachineAuditDao {
 
     public static final String AUDIT_FILE = "audit.txt";
 
+    /**
+     * Writes an audit log entry to the AUDIT_FILE
+     *
+     * @param entry the string being logged.
+     * @throws VendingMachinePersistenceException if loading/saving the audit file fails.
+     */
     public void writeAuditEntry(String entry) throws VendingMachinePersistenceException {
         PrintWriter out;
 
@@ -21,7 +27,7 @@ public class VendingMachineAuditDaoFileImpl implements VendingMachineAuditDao {
         }
 
         LocalDateTime timestamp = LocalDateTime.now();
-        out.println(timestamp.toString() + " : " + entry);
+        out.println(timestamp + " : " + entry);
         out.flush();
     }
 

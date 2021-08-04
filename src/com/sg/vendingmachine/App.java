@@ -27,5 +27,7 @@ public class App {
                 new VendingMachineController(myService, myView);
 
         controller.run();
+
+        myIo.print("\nExiting");
     }
 }

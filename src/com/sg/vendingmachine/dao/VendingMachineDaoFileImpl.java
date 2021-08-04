@@ -26,18 +26,18 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
     public static final String DELIMITER = "::";
 
     /**
-     * Takes a string representing a DVD object and splits it on the DELIMITER
-     * to obtain each property of the DVD.
+     * Takes a string representing a VendingItem object and splits it on the DELIMITER
+     * to obtain each property of the VendingItem.
      *
-     * 1234::Ada::Lovelace::Java-September1842
-     * __________________________________________________________________________
-     * |              |    |              |                        |          | |
-     * |The Green Mile|1999|Frank Darabont|Warner Hollywood Studios|10/10 Good|R|
-     * |              |    |              |                        |          | |
-     * --------------------------------------------------------------------------
+     * Doritos::2.32::5
+     * ________________
+     * |       |    | |
+     * |Doritos|2.32|5|
+     * |       |    | |
+     * ----------------
      *
-     * @param itemAsText String representing a DVD object as text.
-     * @return DVD loaded from database.
+     * @param itemAsText String representing a VendingItem object as text.
+     * @return VendingItem loaded from database.
      */
     private VendingItem unmarshallItem(String itemAsText){
         String[] itemTokens = itemAsText.split(DELIMITER);
@@ -54,13 +54,13 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
     }
 
     /**
-     * Converts a DVD object into a string where each property
+     * Converts a VendingItem object into a string where each property
      * is split by the DELIMITER.
      *
-     * The Green Mile::1999::Frank Darabont::Warner Hollywood Studios::10/10 Good::R
+     * Doritos::2.32::5
      *
-     * @param aVendingItem DVD object to be converted.
-     * @return the string representing the DVD object.
+     * @param aVendingItem VendingItem object to be converted.
+     * @return the string representing the VendingItem object.
      */
     private String marshallItem(VendingItem aVendingItem){
 
@@ -74,8 +74,7 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
     }
 
     /**
-     * Writes all DVDs in the library out to LIBRARY_FILE. See loadLibrary
-     * for file format.
+     * Writes all VendingItems in the database out to VENDING_MACHINE.
      *
      * @throws VendingMachineDaoException if an error occurs writing to the file
      */
@@ -104,10 +103,10 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
     }
 
     /**
-     * Converts all the strings representing DVDs in the
-     * library file into DVD objects.
+     * Converts all the strings representing VendingItems in the
+     * database file into VendingItem objects.
      *
-     * @throws VendingMachineDaoException if loading the library file fails.
+     * @throws VendingMachineDaoException if loading the database file fails.
      */
     private void loadVendingMachine() throws VendingMachineDaoException {
         Scanner scanner;
@@ -137,29 +136,10 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
     }
 
     /**
-     * Adds a DVD to the library file.
+     * Loads all the VendingItems from the database.
      *
-     * @param itemName title with which DVD is to be associated
-     * @param vendingItem DVD to be added to the library
-     * @return the DVD added to the library.
-     * @throws VendingMachineDaoException if loading/saving the library fails.
-     */
-    @Override
-    public VendingItem addItem(String itemName, VendingItem vendingItem) throws VendingMachineDaoException {
-        loadVendingMachine();
-
-        VendingItem newVendingItem = vendingItems.put(itemName, vendingItem);
-
-        writeVendingMachine();
-
-        return newVendingItem;
-    }
-
-    /**
-     * Loads all the DVDs from the library.
-     *
-     * @return the list of DVDs
-     * @throws VendingMachineDaoException if loading the library fails.
+     * @return the list of VendingItems
+     * @throws VendingMachineDaoException if loading the database fails.
      */
     @Override
     public List<VendingItem> getAllItems() throws VendingMachineDaoException {
@@ -168,11 +148,11 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
     }
 
     /**
-     * Retrieves a DVD from the database.
+     * Retrieves a VendingItem from the database.
      *
-     * @param itemName Title of the DVD to retrieve
-     * @return the DVD retrieved
-     * @throws VendingMachineDaoException if loading the library fails.
+     * @param itemName name of the VendingItem to retrieve
+     * @return the VendingItem retrieved
+     * @throws VendingMachineDaoException if loading the database fails.
      */
     @Override
     public VendingItem getItem(String itemName) throws VendingMachineDaoException {
@@ -181,19 +161,23 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
     }
 
     /**
-     * Removes a DVD from the library.
+     * Removes a VendingItem from the database.
      *
-     * @param itemName title of DVD to be removed
-     * @return the removed DVD
-     * @throws VendingMachineDaoException if loading/saving the library fails.
+     * @param itemName name of VendingItem to be removed
+     * @return the removed VendingItem
+     * @throws VendingMachineDaoException if loading/saving the database fails.
      */
     @Override
     public VendingItem dispenseItem(String itemName) throws VendingMachineDaoException {
         loadVendingMachine();
 
         VendingItem dispensedVendingItem = vendingItems.get(itemName);
-        dispensedVendingItem.setCount(dispensedVendingItem.getCount() - 1);
-        vendingItems.put(itemName, dispensedVendingItem);
+        if (dispensedVendingItem != null) {
+            if (dispensedVendingItem.getCount() != 0) {
+                dispensedVendingItem.setCount(dispensedVendingItem.getCount() - 1);
+                vendingItems.put(itemName, dispensedVendingItem);
+            }
+        }
 
         writeVendingMachine();
 
@@ -225,176 +209,6 @@ public class VendingMachineDaoFileImpl implements UserIO, VendingMachineDao {
     public String readString(String msgPrompt) {
         System.out.println(msgPrompt);
         return console.nextLine();
-    }
-
-    /**
-     *
-     * A simple method that takes in a message to display on the console, 
-     * and continually reprompts the user with that message until they enter an integer
-     * to be returned as the answer to that message.
-     *
-     * @param msgPrompt - String explaining what information you want from the user.
-     * @return the answer to the message as integer
-     */
-    @Override
-    public int readInt(String msgPrompt) {
-        boolean invalidInput = true;
-        int num = 0;
-        while (invalidInput) {
-            try {
-                // print the message msgPrompt (ex: asking for the # of cats!)
-                String stringValue = this.readString(msgPrompt);
-                // Get the input line, and try and parse
-                num = Integer.parseInt(stringValue); // if it's 'bob' it'll break
-                invalidInput = false; // or you can use 'break;'
-            } catch (NumberFormatException e) {
-                // If it explodes, it'll go here and do this.
-                this.print("Input error. Please try again.");
-            }
-        }
-        return num;
-    }
-
-    /**
-     *
-     * A slightly more complex method that takes in a message to display on the console, 
-     * and continually reprompts the user with that message until they enter an integer
-     * within the specified min/max range to be returned as the answer to that message.
-     *
-     * @param msgPrompt - String explaining what information you want from the user.
-     * @param min - minimum acceptable value for return
-     * @param max - maximum acceptable value for return
-     * @return an integer value as an answer to the message prompt within the min/max range
-     */
-    @Override
-    public int readInt(String msgPrompt, int min, int max) {
-        int result;
-        do {
-            result = readInt(msgPrompt);
-        } while (result < min || result > max);
-
-        return result;
-    }
-
-    /**
-     *
-     * A simple method that takes in a message to display on the console, 
-     * and continually reprompts the user with that message until they enter a long
-     * to be returned as the answer to that message.
-     *
-     * @param msgPrompt - String explaining what information you want from the user.
-     * @return the answer to the message as long
-     */
-    @Override
-    public long readLong(String msgPrompt) {
-        while (true) {
-            try {
-                return Long.parseLong(this.readString(msgPrompt));
-            } catch (NumberFormatException e) {
-                this.print("Input error. Please try again.");
-            }
-        }
-    }
-
-    /**
-     * A slightly more complex method that takes in a message to display on the console, 
-     * and continually reprompts the user with that message until they enter a double
-     * within the specified min/max range to be returned as the answer to that message.
-     *
-     * @param msgPrompt - String explaining what information you want from the user.
-     * @param min - minimum acceptable value for return
-     * @param max - maximum acceptable value for return
-     * @return an long value as an answer to the message prompt within the min/max range
-     */
-    @Override
-    public long readLong(String msgPrompt, long min, long max) {
-        long result;
-        do {
-            result = readLong(msgPrompt);
-        } while (result < min || result > max);
-
-        return result;
-    }
-
-    /**
-     *
-     * A simple method that takes in a message to display on the console, 
-     * and continually reprompts the user with that message until they enter a float
-     * to be returned as the answer to that message.
-     *
-     * @param msgPrompt - String explaining what information you want from the user.
-     * @return the answer to the message as float
-     */
-    @Override
-    public float readFloat(String msgPrompt) {
-        while (true) {
-            try {
-                return Float.parseFloat(this.readString(msgPrompt));
-            } catch (NumberFormatException e) {
-                this.print("Input error. Please try again.");
-            }
-        }
-    }
-
-    /**
-     *
-     * A slightly more complex method that takes in a message to display on the console, 
-     * and continually reprompts the user with that message until they enter a float
-     * within the specified min/max range to be returned as the answer to that message.
-     *
-     * @param msgPrompt - String explaining what information you want from the user.
-     * @param min - minimum acceptable value for return
-     * @param max - maximum acceptable value for return
-     * @return an float value as an answer to the message prompt within the min/max range
-     */
-    @Override
-    public float readFloat(String msgPrompt, float min, float max) {
-        float result;
-        do {
-            result = readFloat(msgPrompt);
-        } while (result < min || result > max);
-
-        return result;
-    }
-
-    /**
-     *
-     * A simple method that takes in a message to display on the console, 
-     * and continually reprompts the user with that message until they enter a double
-     * to be returned as the answer to that message.
-     *
-     * @param msgPrompt - String explaining what information you want from the user.
-     * @return the answer to the message as double
-     */
-    @Override
-    public double readDouble(String msgPrompt) {
-        while (true) {
-            try {
-                return Double.parseDouble(this.readString(msgPrompt));
-            } catch (NumberFormatException e) {
-                this.print("Input error. Please try again.");
-            }
-        }
-    }
-
-    /**
-     *
-     * A slightly more complex method that takes in a message to display on the console,
-     * and continually reprompts the user with that message until they enter a double
-     * within the specified min/max range to be returned as the answer to that message.
-     *
-     * @param msgPrompt - String explaining what information you want from the user.
-     * @param min - minimum acceptable value for return
-     * @param max - maximum acceptable value for return
-     * @return an double value as an answer to the message prompt within the min/max range
-     */
-    @Override
-    public double readDouble(String msgPrompt, double min, double max) {
-        double result;
-        do {
-            result = readDouble(msgPrompt);
-        } while (result < min || result > max);
-        return result;
     }
 
     /**

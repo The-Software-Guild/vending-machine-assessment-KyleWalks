@@ -5,26 +5,12 @@ import com.sg.vendingmachine.dto.VendingItem;
 import java.util.List;
 
 public interface VendingMachineDao {
-    /**
-     * Adds the given VendingItem to the vending machine and associates it with the given
-     * item name. If there is already a VendingItem associated with the given
-     * item name, it will return that VendingItem object, otherwise it will
-     * return null.
-     *
-     * @param itemName name with which VendingItem is to be associated
-     * @param vendingItem VendingItem to be added to the vending machine
-     * @return the VendingItem object previously associated with the given
-     * item name if it exists, null otherwise
-     * @throws VendingMachineDaoException
-     */
-    VendingItem addItem(String itemName, VendingItem vendingItem)
-            throws VendingMachineDaoException;
 
     /**
      * Returns a List of all VendingItems in the vending machine.
      *
      * @return VendingItem List containing all VendingItems in the vending machine.
-     * @throws VendingMachineDaoException
+     * @throws VendingMachineDaoException if the dao fails to load/save the database. if the dao fails to load/save the database.
      */
     List<VendingItem> getAllItems()
             throws VendingMachineDaoException;
@@ -36,7 +22,7 @@ public interface VendingMachineDao {
      * @param itemName Name of the VendingItem to retrieve
      * @return the VendingItem object associated with the given VendingItem name,
      * null if no such VendingItem exists
-     * @throws VendingMachineDaoException
+     * @throws VendingMachineDaoException if the dao fails to load/save the database.
      */
     VendingItem getItem(String itemName)
             throws VendingMachineDaoException;
@@ -49,8 +35,8 @@ public interface VendingMachineDao {
      * @param itemName name of VendingItem to be removed
      * @return VendingItem object that was removed or null if no VendingItem
      * was associated with the given VendingItem name
-     * @throws VendingMachineDaoException
+     * @throws VendingMachineDaoException if the dao fails to load/save the database.
      */
     VendingItem dispenseItem(String itemName)
-            throws VendingMachineDaoException;
+            throws VendingMachineDaoException, VendingMachineNoItemInventoryException;
 }

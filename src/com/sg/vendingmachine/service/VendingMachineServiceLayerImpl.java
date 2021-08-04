@@ -11,72 +11,63 @@ import java.util.List;
 
 public class VendingMachineServiceLayerImpl implements VendingMachineServiceLayer {
 
-    private VendingMachineDao dao;
-    private VendingMachineAuditDao auditDao;
+    private final VendingMachineDao dao;
+    private final VendingMachineAuditDao auditDao;
 
     public VendingMachineServiceLayerImpl(VendingMachineDao dao, VendingMachineAuditDao auditDao) {
         this.dao = dao;
         this.auditDao = auditDao;
     }
 
-    @Override
-    public void createItem(VendingItem item) throws
-            VendingMachineDuplicateNameException,
-            VendingMachineDataValidationException,
-            VendingMachinePersistenceException,
-            VendingMachineDaoException {
-
-        if (dao.getItem(item.getName()) != null) {
-            throw new VendingMachineDuplicateNameException(
-                    "ERROR: Could not create vending item.  Item "
-                            + item.getName()
-                            + " already exists");
-        }
-
-        validateItemData(item);
-
-        dao.addItem(item.getName(), item);
-
-        auditDao.writeAuditEntry("Vending Item " + item.getName() + " CREATED.");
-    }
-
+    /**
+     * Retrieves all the vending items in the database.
+     *
+     * @return the hashmap of all vending items.
+     * @throws VendingMachineDaoException if the dao fails to save/load the database.
+     */
     @Override
     public List<VendingItem> getAllItems() throws
-            VendingMachinePersistenceException,
             VendingMachineDaoException {
 
         return dao.getAllItems();
     }
 
+    /**
+     * Retrieves the vending item specified by name.
+     *
+     * @param itemName the name of the vending item
+     * @return the vending item
+     * @throws VendingMachineDaoException if the dao fails to load/save the database.
+     * @throws VendingMachineNoItemInventoryException if the item has a count of zero.
+     */
     @Override
     public VendingItem getVendingItem(String itemName) throws
-            VendingMachinePersistenceException,
-            VendingMachineDaoException {
+            VendingMachineDaoException, VendingMachineNoItemInventoryException {
 
-        return dao.getItem(itemName);
+        VendingItem item = dao.getItem(itemName);
+
+        if (item != null)
+            if (item.getCount() == 0)
+                throw new VendingMachineNoItemInventoryException("Item is out of stock.\n");
+
+        return item;
     }
 
+    /**
+     * Dispenses a VendingItem from the machine.
+     *
+     * @param itemName the name of the item being dispensed
+     * @return The vending item being dispensed.
+     * @throws VendingMachinePersistenceException if the audit fails to log to the audit file.
+     * @throws VendingMachineDaoException if the dao fails to load/save the database.
+     */
     @Override
     public VendingItem dispenseVendingItem(String itemName) throws
             VendingMachinePersistenceException,
             VendingMachineDaoException, VendingMachineNoItemInventoryException {
 
-        if (dao.getItem(itemName).getCount() == 0)
-            throw new VendingMachineNoItemInventoryException("Item is out of stock.");
-
         auditDao.writeAuditEntry("VendingItem " + itemName + " DISPENSED.");
         return dao.dispenseItem(itemName);
     }
 
-    private void validateItemData(VendingItem item) throws VendingMachineDataValidationException {
-        if (item.getName() == null
-                || item.getName().trim().length() == 0
-                || item.getPrice() == null
-                || item.getPrice().compareTo(new BigDecimal(0)) < 0
-                || item.getCount() < 0) {
-
-            throw new VendingMachineDataValidationException(
-                    "ERROR: All fields [Name, Price, Count] are required.");
-        }
-    }
 }

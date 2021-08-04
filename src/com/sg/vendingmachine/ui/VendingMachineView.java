@@ -1,5 +1,6 @@
 package com.sg.vendingmachine.ui;
 
+import com.sg.vendingmachine.dto.Change;
 import com.sg.vendingmachine.dto.VendingItem;
 
 import java.math.BigDecimal;
@@ -13,28 +14,10 @@ public class VendingMachineView {
         this.io = io;
     }
 
-    /**
-     * Display the main menu of the application.
-     *
-     * @return the user menu choice as an integer.
-     */
-    public int printMenuAndGetSelection() {
-
-        io.print("Main Menu");
-        io.print("1. List vending items");
-        io.print("2. View a vending item");
-        io.print("3. Create New vending item");
-        io.print("4. Remove a vending item");
-        io.print("5. Edit a vending item");
-        io.print("6. Exit");
-
-        return io.readInt("Please select from the above choices.", 1, 6);
-    }
-
     public BigDecimal getCurrency() {
         BigDecimal currency;
 
-        currency = io.readBigDecimal("Please enter a sum of money.", new BigDecimal(0));
+        currency = io.readBigDecimal("Please enter a sum of money (0 to exit).", new BigDecimal("0"));
 
         return currency;
     }
@@ -55,12 +38,21 @@ public class VendingMachineView {
         }
     }
 
-    public void displayChangeResult(BigDecimal change) {
-        io.print("Your change is: $" + change);
+    public void displayChangeResult(Change change, int[] changeAsCoins) {
+        String out = String.format("Your change is: $%s\n%5d Quarter(s) %5d Dime(s) %5d Nickel(s) %5d Penny(s)",
+                change.getChange(),
+                changeAsCoins[0],
+                changeAsCoins[1],
+                changeAsCoins[2],
+                changeAsCoins[3]);
+
+        io.print(out);
+
+        io.readString("\nPress enter to continue.");
     }
 
     public String getItemNameChoice() {
-        return io.readString("Please enter the vending item name.");
+        return io.readString("Please enter the vending item name (0 to exit).");
     }
 
     /**
@@ -69,8 +61,6 @@ public class VendingMachineView {
      * @param vendingItem the vending item to be displayed.
      */
     public void displayItem(VendingItem vendingItem) {
-        io.print("");
-
         if (vendingItem != null) {
             System.out.printf("%20s: %-15s\n", "Name", vendingItem.getName());
             System.out.printf("%20s: %-15s\n", "Price", vendingItem.getPrice());
@@ -78,23 +68,17 @@ public class VendingMachineView {
 
             io.print("");
         } else {
-            io.print("No such vending item.");
+            io.print("No such vending item.\n");
         }
-
-        io.readString("Please hit enter to continue.");
     }
 
     public void displayErrorMessage(String errorMsg) {
-        io.print("=== ERROR ===");
+        io.print("\n=== ERROR ===");
         io.print(errorMsg);
     }
 
     public void displayExitBanner() {
-        io.print("Closing.");
-    }
-
-    public void displayUnknownCommandBanner() {
-        io.print("Unknown Command!!!");
+        io.print("\nClosing.");
     }
 
     public void displayDisplayAllBanner() {
