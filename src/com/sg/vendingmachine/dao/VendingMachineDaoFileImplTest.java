@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 
 class VendingMachineDaoFileImplTest {
 
-    VendingMachineDaoFileImpl dao = new VendingMachineDaoFileImpl();
-    
+    final VendingMachineDaoFileImpl dao = new VendingMachineDaoFileImpl();
+
     @Test
     void getAllItems() throws Exception {
         dao.getAllItems();

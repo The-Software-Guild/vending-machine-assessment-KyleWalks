@@ -9,11 +9,11 @@ import java.util.List;
 public interface VendingMachineServiceLayer {
 
     List<VendingItem> getAllItems() throws
-            VendingMachinePersistenceException, VendingMachineDaoException;
+            VendingMachineDaoException;
 
     VendingItem getVendingItem(String itemName) throws
-            VendingMachinePersistenceException, VendingMachineDaoException, VendingMachineNoItemInventoryException;
+            VendingMachineDaoException, VendingMachineNoItemInventoryException;
 
-    VendingItem dispenseVendingItem(String itemName) throws
+    void dispenseVendingItem(String itemName) throws
             VendingMachinePersistenceException, VendingMachineDaoException, VendingMachineNoItemInventoryException;
 }

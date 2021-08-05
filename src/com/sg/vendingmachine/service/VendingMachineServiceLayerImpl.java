@@ -6,7 +6,6 @@ import com.sg.vendingmachine.dao.VendingMachineDaoException;
 import com.sg.vendingmachine.dao.VendingMachineNoItemInventoryException;
 import com.sg.vendingmachine.dto.VendingItem;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class VendingMachineServiceLayerImpl implements VendingMachineServiceLayer {
@@ -57,17 +56,16 @@ public class VendingMachineServiceLayerImpl implements VendingMachineServiceLaye
      * Dispenses a VendingItem from the machine.
      *
      * @param itemName the name of the item being dispensed
-     * @return The vending item being dispensed.
      * @throws VendingMachinePersistenceException if the audit fails to log to the audit file.
      * @throws VendingMachineDaoException if the dao fails to load/save the database.
      */
     @Override
-    public VendingItem dispenseVendingItem(String itemName) throws
+    public void dispenseVendingItem(String itemName) throws
             VendingMachinePersistenceException,
             VendingMachineDaoException, VendingMachineNoItemInventoryException {
 
         auditDao.writeAuditEntry("VendingItem " + itemName + " DISPENSED.");
-        return dao.dispenseItem(itemName);
+        dao.dispenseItem(itemName);
     }
 
 }

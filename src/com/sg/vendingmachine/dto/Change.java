@@ -26,20 +26,14 @@ public class Change {
         }
     }
 
-    private VendingItem item;
-    private BigDecimal amountEntered;
+    private final VendingItem item;
+    private final BigDecimal amountEntered;
     private BigDecimal change;
 
     public Change(VendingItem item, BigDecimal amount) {
         this.item = item;
         this.amountEntered = amount;
         this.change = calcChange();
-    }
-
-    public Change(VendingItem item, BigDecimal amount, BigDecimal change) {
-        this.item = item;
-        this.amountEntered = amount;
-        this.change = change;
     }
 
     /**
@@ -56,22 +50,6 @@ public class Change {
         this.change = change.round(new MathContext(5));
 
         return this.change;
-    }
-
-    public VendingItem getItem() {
-        return item;
-    }
-
-    public void setItem(VendingItem item) {
-        this.item = item;
-    }
-
-    public BigDecimal getAmountEntered() {
-        return amountEntered;
-    }
-
-    public void setAmountEntered(BigDecimal amountEntered) {
-        this.amountEntered = amountEntered;
     }
 
     public BigDecimal getChange() {
@@ -121,10 +99,6 @@ public class Change {
 
                 // Subtract the amount of quarters owed.
                 smallDenom = smallDenom.subtract(numQuarters);
-
-                // Calculate number of quarters owed for whole dollar amount (whole dollar / 0.25)
-                BigDecimal quarterAsDecimal = Coins.QUARTER.getVal().divide(new BigDecimal("100"), 4, RoundingMode.DOWN);
-                coins[0] += (largeDenom.divide(quarterAsDecimal, RoundingMode.DOWN)).intValueExact();
             }
             if (smallDenom.divide(Coins.DIME.getVal(), RoundingMode.DOWN).compareTo(Coins.PENNY.getVal()) >= 0) {
                 // Get the number of dimes by (fraction dollar amount / 10)
@@ -155,9 +129,11 @@ public class Change {
                 coins[3] = numPennys.intValueExact();
 
                 numPennys = Coins.PENNY.getVal().multiply(numPennys);
-
-                // Subtract the amount of dimes owed.
-                smallDenom = smallDenom.subtract(numPennys);
+            }
+            if (largeDenom.compareTo(new BigDecimal("1")) >= 0) {
+                // Calculate number of quarters owed for whole dollar amount (whole dollar / 0.25)
+                BigDecimal quarterAsDecimal = Coins.QUARTER.getVal().divide(new BigDecimal("100"), 4, RoundingMode.DOWN);
+                coins[0] += (largeDenom.divide(quarterAsDecimal, RoundingMode.DOWN)).intValueExact();
             }
         }
 

@@ -32,32 +32,34 @@ public class VendingMachineController {
     public void run() {
         VendingItem currItem = null;
         BigDecimal enteredMoney;
-        boolean dispensed = false;
+        boolean dispensed;
         try {
             while (true) {
+                dispensed = false;
+
                 listItems();
+
                 // Query for money
                 enteredMoney = enterMoney();
                 if (enteredMoney.equals(new BigDecimal("0")))
                     return;
-                while (currItem == null) {
+
+                while (currItem == null || !dispensed) {
                     try {
                         currItem = getChoice();
-                    } catch (VendingMachineNoItemInventoryException e) {
+                        // Exit case
+                        if (currItem != null && currItem.getName().equals(""))
+                            return;
+
+                        dispensed = dispenseItem(currItem, enteredMoney);
+
+                    } catch (VendingMachineNoItemInventoryException | VendingMachineInsufficientFundsException e) {
                         view.displayErrorMessage(e.getMessage());
                     }
                 }
 
-                // Query item choice
-                while (!dispensed) {
-                    try {
-                        dispensed = dispenseItem(currItem, enteredMoney);
-                    } catch (VendingMachineInsufficientFundsException e) {
-                        view.displayErrorMessage(e.getMessage());
-                    }
-                }
             }
-        } catch (VendingMachineDaoException | VendingMachinePersistenceException | VendingMachineNoItemInventoryException e) {
+        } catch (VendingMachineDaoException | VendingMachinePersistenceException e) {
             view.displayErrorMessage(e.getMessage());
         }
     }
@@ -77,15 +79,14 @@ public class VendingMachineController {
      *
      * @return The VendingItem selected by the user.
      * @throws VendingMachineDaoException If the application fails to load the database file.
-     * @throws VendingMachinePersistenceException If the audit log fails to load/save to the audit file.
      * @throws VendingMachineNoItemInventoryException If the item selected is out of stock.
      */
-    private VendingItem getChoice() throws VendingMachineDaoException, VendingMachinePersistenceException, VendingMachineNoItemInventoryException {
+    private VendingItem getChoice() throws VendingMachineDaoException, VendingMachineNoItemInventoryException {
         String itemName = view.getItemNameChoice();
 
         // Check for exit num
         if (itemName.equals("0"))
-            return null;
+            return new VendingItem("");
 
         VendingItem selItem = service.getVendingItem(itemName);
 
@@ -125,7 +126,7 @@ public class VendingMachineController {
      *
      * @throws VendingMachineDaoException if loading the database fails.
      */
-    private void listItems() throws VendingMachineDaoException, VendingMachinePersistenceException {
+    private void listItems() throws VendingMachineDaoException {
         view.displayDisplayAllBanner();
         List<VendingItem> vendingItemList = service.getAllItems();
         view.displayItemList(vendingItemList);

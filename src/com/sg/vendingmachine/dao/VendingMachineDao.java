@@ -38,5 +38,5 @@ public interface VendingMachineDao {
      * @throws VendingMachineDaoException if the dao fails to load/save the database.
      */
     VendingItem dispenseItem(String itemName)
-            throws VendingMachineDaoException, VendingMachineNoItemInventoryException;
+            throws VendingMachineDaoException;
 }

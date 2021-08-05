@@ -5,7 +5,7 @@ import com.sg.vendingmachine.dto.VendingItem;
 
 class VendingMachineServiceLayerImplTest {
 
-    VendingMachineDaoFileImpl dao = new VendingMachineDaoFileImpl();
+    final VendingMachineDaoFileImpl dao = new VendingMachineDaoFileImpl();
 
     @org.junit.jupiter.api.Test
     void getAllItems() throws Exception {
